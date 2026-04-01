@@ -12,3 +12,6 @@ wheels/
 # Secrets
 .env
 activate/
+
+# Scratchbooks
+.main.ipynb
