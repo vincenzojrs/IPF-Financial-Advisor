@@ -124,19 +124,23 @@ class CleanerScraper:
                 print(f"Skipping {url} because no <article> tag was found!")
                 continue
 
-            page_cleaned = []
+            paragraph = []
 
             for article in articles:
                 for tag in article.find_all(tags):
-                    text = tag.get_text(strip=True)
+                    text = tag.get_text(" ", strip=True)
                     if text:
-                        page_cleaned.append(text)
+                            paragraph.append(text)
 
-            if not page_cleaned:
+            if not paragraph:
                 print(f"Skipping {url} because no text was found.")
                 continue
 
-            website_clean.append({"url": url, "content": " ".join(page_cleaned)})
+            website_clean.append({
+                    "url": url,
+                    "content": "\n\n".join(paragraph)
+                    })
+
         return website_clean
 
     def scrape(self):
