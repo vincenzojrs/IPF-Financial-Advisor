@@ -31,18 +31,18 @@ A `CleanerScraper` class was created, gathering data extraction and cleaning fun
 <details>
 <summary>Architectural choices about semantic chunking, embeddingd, and storage</summary>
 
-## Naive semantic chunker
+## Background
 
-Embedding a text consists in translating human language into something that the machine can elaborate. Embedding a piece of human-language information consists in creating a numerical representation of words, sentences, or whole paragraphs. Such numerical representation is a vector, consisting in a list of numbers, each referring to some linguistic features of the word, like genre, number, color, etc.
-A common practice before embedding a document consists in dividing the whole text into smaller bits, called "chunks". While it would be possible to embed single words, embedding whole sentences or paragraph allow incorporating in the numerical representation of a word, also information related to its context. 
+Embedding a text consists in translating human language into something that the machine can elaborate. Embedding a piece of human-language information consists in creating numerical representations of words, sentences, or whole paragraphs. Such numerical representations are vectors, consisting in lists of numbers, where each number refers to some semantic features of the word, like genre, number, color, etc.
+A common practice before embedding a document consists in dividing the whole text into smaller bits, called "chunks". Embedding sentences or paragraphs rather than individual words allows each vector to incorporate both word-level information and its broader context.
+After chunking, the sentences are _translated_ into vectors via an embedding model and usually stored into a vector database.
 
+## Semantic chunking - overkill solution
 The Wiki was well organized, and its pages coincise, brief and direct. A semantic chunking approach was immediately recognized to be an overkill solution. However, it was still chosen and coded for educational purposes.
-A semantic chunking approach was chosen to create the Wiki chunks and subsequently vectorize them.
-This was done exclusively for educational purposes: the Wiki was already well-organized and the language used was very concise and direct, to allow immediate understanding for those consulting it. Nevertheless, it was decided to implement the semantic chunking approach for study purposes.
-Semantic chunking consists of splitting the original text into chunks using punctuation or line breaks, since it is assumed that each sentence delimited in this way carries a complete meaning. The similarity between each pair of consecutive chunks is then calculated, and a new chunk is created by aggregating consecutive ones whose similarity exceeds a certain threshold. The goal is therefore to obtain a smaller number of chunks containing mutually coherent information, in order to improve embedding performance.
-For this reason, no existing library was used; instead, the functions were written from scratch. A dedicated class called SemanticChunker was created, which splits the corpus and the entire document based on punctuation marks, while preserving useful metadata such as the reference link for each chunk and their identification ID.
-Using an OpenAI embedding model, each chunk was vectorized and, leveraging the NumPy library, the cosine similarity was computed for each pair of consecutive chunks. Whenever the similarity exceeded an empirically established threshold, the two chunks were merged into one.
-The process is iterative: the aggregation of multiple chunks terminates when one of two conditions is met — either the maximum number of aggregated chunks is reached, or the similarity drops below the established threshold.
-Also for computational optimization purposes, a dedicated vector collection was created on MongoDB Atlas, so that embeddings would not need to be recalculated every time. At the end of the semantic chunking process, the embeddings to be used for RAG purposes are recalculated.
+Semantic chunking consists of splitting the original text into chunks using punctuation or line breaks, assuming that each sentences, delimited by a strong punctuation or a line break, carries a complete meaning. The similarity between each a vector and its consecutive one is iteratively calculated, and once it exceeds a certain threshold, a new, bigger chunk is created by aggregation. The goal is therefore to obtain a smaller number of chunks containing mutually coherent information, in order to improve embedding performance.
+
+- A dedicated class called SemanticChunker was created, which splits the corpus and the entire document based on punctuation marks, while preserving useful metadata such as the reference link for each chunk and their identification ID.
+- Using an OpenAI embedding model, each chunk was vectorized and, leveraging the NumPy library, the cosine similarity was computed for each pair of consecutive chunks.
+- Once the text chunks are created, newer embedding are created and stored in MongoDB Atlas.
 
 </details>
