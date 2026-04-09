@@ -1,0 +1,36 @@
+main:
+  wiki_link : https://www.italiapersonalfinance.it
+  metadata_semantic_chunking : url
+
+cleaner_scraper:
+  create_sitemap:
+    max_depth : 3
+    instructions: Find all blog articles, guides, and educational content pages.
+    allow_external : False
+
+  return_cleaned_pages:
+    article_tag : article
+    tags: 
+      - h1
+      - h2
+      - h3
+      - h4
+      - p
+
+semantic_chunker:
+  embedding_model : text-embedding-3-small
+  splitter:
+    chunk_size : 400
+    chunk_overlap: 0
+    separators:
+      - \n\n
+      - \n
+      - .
+    is_separator_regex : False
+  database_name : Financial_Advisor
+  vector_store:
+    index_name : vector_index
+
+
+
+
