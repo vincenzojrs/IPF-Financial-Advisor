@@ -19,5 +19,4 @@ dependencies = [
     "pymongo>=4.16.0",
     "python-dotenv>=1.2.2",
     "requests>=2.33.1",
-    "tqdm>=4.67.3",
 ]
