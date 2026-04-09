@@ -8,8 +8,6 @@ While we acknowledge there are much more direct solutions to implement some func
 
 The project was broken down in several pieces:
 - Web crawling using `TavilyMap` for sitemap creationg and `BeautifulSoup` for data scraping and cleaning;
-- Naive semantic chunking using `Numpy`, vectorization using `OpenAI`, and storing in  `MongoDB Atlas`;
-
 
 <details>
 <summary>Architectural choices about web crawling and data cleaning</summary>
@@ -28,6 +26,8 @@ A `CleanerScraper` class was created, gathering data extraction and cleaning fun
 
 </details>
 
+- Naive semantic chunking using `Numpy`, vectorization using `OpenAI`, and storing in  `MongoDB Atlas`;
+
 <details>
 <summary>Architectural choices about semantic chunking, embeddingd, and storage</summary>
 
@@ -44,5 +44,32 @@ Semantic chunking consists of splitting the original text into chunks using punc
 - A dedicated class called SemanticChunker was created, which splits the corpus and the entire document based on punctuation marks, while preserving useful metadata such as the reference link for each chunk and their identification ID.
 - Using an OpenAI embedding model, each chunk was vectorized and, leveraging the NumPy library, the cosine similarity was computed for each pair of consecutive chunks.
 - Once the text chunks are created, newer embedding are created and stored in MongoDB Atlas.
+
+</details>
+
+- RAG enhancing: hybrid search using `BM25`, `RRF` for ensambling and reranking using `Cross Encoding`
+<details>
+<summary>Architectural choices about hybrid search, RRF, and reranking.</summary>
+
+Several techniques were implemnted to improve RAG performance.
+
+One of these involved adopting hybrid search, that is, _ensambling_ the advantages of vector search (VS) - the approach employed so far to retrieve relevant documents based on the semantic meaning encoded in embeddings - with full-text search (FTS), a retrieval method that deems a document relevant according to the occurrence of the query terms within it.
+
+While VS scored relevancy based on cosine similarity, Best Match 25 (BM25) was implemented to calculate similarity scores for FTS. BM25 extends the features of the more popular Tf-IdF algorithm, that scores relevancy of a document based on the occurence of a word within documents in a corpus, and across the whole corpus. Like Tf-IdF, BM25 scores positevely documents where a word occurs most frequently, and scales down the score if the word occurs in many documents. BM25 introduces document length normalization, promoting smaller documents, and term frequency saturation, tweaking the influence of the term frequency in the similarity score.
+
+The two search methods produces two rankings, so an _ensambled_ ranking is created using a Reciprocal Rank Fusion (RRF) algorithm, natively implemented via MongoDBAtlas. RRF combines rankings from two ranks, summing the reciprocals of the ranking for each search method, as well as using a constant. The higher the rank the document has acorss diferrent algorithms, the higher will be in the final ranking.
+
+TOFIX:
+
+Cross encoding is a technique used to return to the LLM only a subset of the most relevant document to enhance retrieval performance. The relevance of each pair of query-document is calculated via a specific
+
+A subgroup of the most relevant documents.
+
+Which are passed through an encoder, a big encoder that is queued to both the referring query and each document.
+
+And queuing both the query and the chi allows us to grasp semantic nuances.
+
+Which otherwise we wouldn't be able to. Through a specific model. We can establish. What are the most relevant N sources for our carpet.
+
 
 </details>
