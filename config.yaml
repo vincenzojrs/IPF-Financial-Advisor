@@ -28,8 +28,37 @@ semantic_chunker:
       - .
     is_separator_regex : False
   database_name : Financial_Advisor
+  collection_name : AfterSemChunking
   vector_store:
     index_name : vector_index
+    embedding_key : embedding
+    text_key : text
+    relevance_score_fn : cosine
+
+hybrid_retrieval:
+  retriever:
+    search_index_name : fulltext_search_index
+    top_k : 10
+    fulltext_penalty : 50
+    vector_penalty : 50
+
+  reranker:
+    model: rerank-v4.0-fast
+
+indexing:
+  vector_index:
+    type : vector
+    path : embedding
+    numDimensions : 1536
+    similarity : cosine
+    name : vector_index
+    type_A : vectorSearch
+  fulltext_index:
+    name : fulltext_search_index
+    type : search
+
+generator:
+  ollama_model : qwen3:1.7b
 
 
 

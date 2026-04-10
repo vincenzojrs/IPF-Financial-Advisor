@@ -1,20 +1,33 @@
-from config import WIKI_LINK, METADATA_SEMANTIC_CHUNKING
 from CleanerScraper import CleanerScraper
+from config import METADATA_SEMANTIC_CHUNKING, WIKI_LINK
+from Generator import generate_answer
+from HybridRetrieval import HybridRetrieval
+from Indexing import create_indexes
 from SemanticChunker import SemanticChunker
 
 
-def main():
-    print("Hello from financial-advisor!")
+class FinancialAdvisorRAG:
+    def __init__(self, need_ingestion: bool = False):
 
-    scraper = CleanerScraper(WIKI_LINK)
-    print("\nCreating sitemap\n")
-    scraper.create_sitemap()
-    print("\nCrawling data\n")
-    results = scraper.scrape()
+        if need_ingestion:
+            self.scraper = CleanerScraper(WIKI_LINK)
+            self.scraper.create_sitemap()
+            result = self.scraper.scrape()
+            self.chunker = SemanticChunker(result, metadata=METADATA_SEMANTIC_CHUNKING)
+            self.chunker.run()
 
-    chunker = SemanticChunker(results, metadata=METADATA_SEMANTIC_CHUNKING)
-    print("\nPerforming semantic chunking\n")
-    sem_docs = chunker.run()
+            create_indexes()
+
+        self.retrieval = HybridRetrieval()
+
+    def ask(self, query):
+        docs = self.retrieval.retrieve(query)
+        return generate_answer(query, docs)
+
 
 if __name__ == "__main__":
-    main()
+    print("Ciao dal tuo financial advisor pignolazzo!")
+    rag = FinancialAdvisorRAG(need_ingestion=False)
+    query = "Che cos'è un ETF?"
+    result = rag.ask(query)
+    print(result)

@@ -1,7 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 from langchain_tavily import TavilyMap
-from config import MAX_DEPTH_SITEMAP_SCRAPER, INSTRUCTIONS_SITEMAP_SCRAPER, ALLOW_EXT_SITEMAP_SCRAPER, ARTICLE_TAG_CLEAN_PAGES, TAGS_CLEAN_PAGES, TAVILY_API_KEY
+
+from config import (ALLOW_EXT_SITEMAP_SCRAPER, ARTICLE_TAG_CLEAN_PAGES,
+                    INSTRUCTIONS_SITEMAP_SCRAPER, MAX_DEPTH_SITEMAP_SCRAPER,
+                    TAGS_CLEAN_PAGES, TAVILY_API_KEY)
+
 
 class CleanerScraper:
     """
@@ -56,7 +60,7 @@ class CleanerScraper:
             max_depth=max_depth,
             instructions=instructions,
             allow_external=allow_external,
-            tavily_api_key = TAVILY_API_KEY
+            tavily_api_key=TAVILY_API_KEY,
         )
 
         self.site_map = map.invoke({"url": self.url})["results"]
@@ -108,7 +112,7 @@ class CleanerScraper:
             # website_clean -> [{"content" : "Search Images I'm feeling Lucky Google", {"url": https;//google.com}]
 
         """
-        
+
         website_clean = []
 
         for page_soup in pages_soup:
