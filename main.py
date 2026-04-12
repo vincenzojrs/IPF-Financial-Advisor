@@ -1,9 +1,9 @@
-from CleanerScraper import CleanerScraper
+from src.RAG.CleanerScraper import CleanerScraper
 from config import METADATA_SEMANTIC_CHUNKING, WIKI_LINK
-from Generator import generate_answer
-from HybridRetrieval import HybridRetrieval
-from Indexing import create_indexes
-from SemanticChunker import SemanticChunker
+from src.RAG.Generator import generate_answer
+from src.RAG.HybridRetrieval import HybridRetrieval
+from src.RAG.Indexing import create_indexes
+from src.RAG.SemanticChunker import SemanticChunker
 
 
 class FinancialAdvisorRAG:
