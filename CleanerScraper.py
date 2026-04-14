@@ -1,10 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
 from langchain_tavily import TavilyMap
-
-load_dotenv()
-
+from config import MAX_DEPTH_SITEMAP_SCRAPER, INSTRUCTIONS_SITEMAP_SCRAPER, ALLOW_EXT_SITEMAP_SCRAPER, ARTICLE_TAG_CLEAN_PAGES, TAGS_CLEAN_PAGES, TAVILY_API_KEY
 
 class CleanerScraper:
     """
@@ -32,9 +29,9 @@ class CleanerScraper:
 
     def create_sitemap(
         self,
-        max_depth: int = 3,
-        instructions: str = "Find all blog articles, guides, and educational content pages",
-        allow_external: bool = False,
+        max_depth: int = MAX_DEPTH_SITEMAP_SCRAPER,
+        instructions: str = INSTRUCTIONS_SITEMAP_SCRAPER,
+        allow_external: bool = ALLOW_EXT_SITEMAP_SCRAPER,
     ) -> list[str]:
         """
         Creates a sitemap by crawling the URL provided at instantiation using TavilyMap
@@ -59,6 +56,7 @@ class CleanerScraper:
             max_depth=max_depth,
             instructions=instructions,
             allow_external=allow_external,
+            tavily_api_key = TAVILY_API_KEY
         )
 
         self.site_map = map.invoke({"url": self.url})["results"]
@@ -110,9 +108,7 @@ class CleanerScraper:
             # website_clean -> [{"content" : "Search Images I'm feeling Lucky Google", {"url": https;//google.com}]
 
         """
-        article_tag = "article"
-        tags = ["h1", "h2", "h3", "h4", "p"]
-
+        
         website_clean = []
 
         for page_soup in pages_soup:
@@ -120,7 +116,7 @@ class CleanerScraper:
             content = page_soup["content"]
             url = page_soup["url"]
             print(f"Cleaning {url}...")
-            articles = content.find_all(article_tag)
+            articles = content.find_all(ARTICLE_TAG_CLEAN_PAGES)
 
             if not articles:
                 print(f"Skipping {url} because no <article> tag was found!")
@@ -129,7 +125,7 @@ class CleanerScraper:
             paragraph = []
 
             for article in articles:
-                for tag in article.find_all(tags):
+                for tag in article.find_all(TAGS_CLEAN_PAGES):
                     text = tag.get_text(" ", strip=True)
                     if text:
                         paragraph.append(text)

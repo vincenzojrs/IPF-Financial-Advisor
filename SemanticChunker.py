@@ -1,14 +1,10 @@
-import os
-
 import numpy as np
-from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_mongodb import MongoDBAtlasVectorSearch
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pymongo import MongoClient
-
-load_dotenv()
+from config import EMBEDDING_MODEL, CHUNK_SIZE_SPLITTER, CHUNK_OVLP_SPLITTER, SEPARATORS_SPLITTER, IS_SEP_RGX_SPLITTER, DATABASE_NAME, VECTOR_STORE_IDX_NAME, OPENAI_API_KEY, MONGO_URI
 
 
 class SemanticChunker:
@@ -61,8 +57,8 @@ class SemanticChunker:
             for doc in texts
         ]
         self.embedding_model = OpenAIEmbeddings(
-            openai_api_key=os.environ.get("OPENAI_API_KEY"),
-            model="text-embedding-3-small",
+            openai_api_key=OPENAI_API_KEY,
+            model=EMBEDDING_MODEL,
         )
 
     def _split_text(self) -> list[Document]:
@@ -83,10 +79,10 @@ class SemanticChunker:
                             ]
         """
         splitter = RecursiveCharacterTextSplitter(
-            chunk_size=400,
-            chunk_overlap=0,
-            separators=["\n\n", "\n", "."],
-            is_separator_regex=False,
+            chunk_size=CHUNK_SIZE_SPLITTER,
+            chunk_overlap=CHUNK_OVLP_SPLITTER,
+            separators=SEPARATORS_SPLITTER,
+            is_separator_regex=IS_SEP_RGX_SPLITTER,
         )
 
         split_docs = splitter.split_documents(self.docs)
@@ -110,14 +106,14 @@ class SemanticChunker:
             self._store_split(chunks, OpenAIEmbeddings8), "new_collection")
         """
 
-        mongo_client = MongoClient(os.getenv("MONGO_URI"))
-        collection = mongo_client["Financial_Advisor"][collection_name]
+        mongo_client = MongoClient(MONGO_URI)
+        collection = mongo_client[DATABASE_NAME][collection_name]
 
         vector_store = MongoDBAtlasVectorSearch.from_documents(
             documents=chunks,
             embedding=embedding_model,
             collection=collection,
-            index_name="vector_index",
+            index_name=VECTOR_STORE_IDX_NAME,
         )
 
     def _vectorize_splits(self, split_docs: list[Document]):
