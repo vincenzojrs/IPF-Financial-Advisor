@@ -214,3 +214,21 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# virtual environment
+.venv/
+
+# python cache
+__pycache__/
+
+# environment variables
+.env
+
+# notebooks
+.main.ipynb
+
+# python version manager
+.python-version
+
+# uv lockfile
+uv.lock
