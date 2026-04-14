@@ -48,6 +48,7 @@ Semantic chunking consists of splitting the original text into chunks using punc
 </details>
 
 - RAG enhancing: hybrid search using `BM25`, `RRF` for ensambling and reranking using `Cross Encoding`
+
 <details>
 <summary>Architectural choices about hybrid search, RRF, and reranking.</summary>
 
@@ -70,6 +71,5 @@ Which are passed through an encoder, a big encoder that is queued to both the re
 And queuing both the query and the chi allows us to grasp semantic nuances.
 
 Which otherwise we wouldn't be able to. Through a specific model. We can establish. What are the most relevant N sources for our carpet.
-
 
 </details>
