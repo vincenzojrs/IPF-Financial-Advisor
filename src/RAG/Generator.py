@@ -1,11 +1,13 @@
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
-from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
+from pydantic import BaseModel, Field
+
 from config import OPENAI_API_KEY, OPENAI_GEN_MODEL
 
 # from config import OLLAMA_MODEL
 # from langchain_ollama import ChatOllama
+
 
 class Citation(BaseModel):
     """
@@ -91,8 +93,9 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-llm = ChatOpenAI(model=OPENAI_GEN_MODEL, temperature=0.3, openai_api_key = OPENAI_API_KEY)
+llm = ChatOpenAI(model=OPENAI_GEN_MODEL, temperature=0.3, openai_api_key=OPENAI_API_KEY)
 citation_chain = prompt | llm.with_structured_output(AnswerWithCitations)
+
 
 def generate_answer(query: str, docs: list[Document]) -> AnswerWithCitations:
     cited_docs = format_citations(docs)
