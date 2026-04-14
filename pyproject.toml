@@ -1,0 +1,16 @@
+[project]
+name = "financial-advisor"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "black>=26.3.1",
+    "ipykernel>=7.2.0",
+    "isort>=8.0.1",
+    "langchain-mongodb>=0.11.0",
+    "langchain-openai>=1.1.12",
+    "langchain-tavily>=0.2.17",
+    "pymongo>=4.16.0",
+    "python-dotenv>=1.2.2",
+]
