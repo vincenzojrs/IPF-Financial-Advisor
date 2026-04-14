@@ -26,7 +26,7 @@ A `CleanerScraper` class was created, gathering data extraction and cleaning fun
 
 </details>
 
-- Naive semantic chunking using `Numpy`, vectorization using `OpenAI`, and storing in  `MongoDB Atlas`;
+- Naive semantic chunking using `Numpy`, vectorization using `OpenAI`, and storing in `MongoDB Atlas`;
 
 <details>
 <summary>Architectural choices about semantic chunking, embeddingd, and storage</summary>
