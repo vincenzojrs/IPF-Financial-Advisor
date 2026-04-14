@@ -1,6 +1,6 @@
+from collections import defaultdict
 import streamlit as st
 from main import FinancialAdvisorRAG
-from collections import defaultdict
 
 st.title("Il financial advisor per pignolazzi!")
 
@@ -29,7 +29,7 @@ for message in st.session_state.messages:
 
 # Create chat input bar, and append prompt to chat history
 if prompt := st.chat_input("Come posso aiutarti?"):
-    st.session_state.messages.append({"role" : "user", "content": prompt})
+    st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
@@ -39,8 +39,6 @@ if prompt := st.chat_input("Come posso aiutarti?"):
         citations = [c.model_dump() for c in response.citations]
         render_citations(citations)
 
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": response.answer,
-        "citations": citations
-    })
+    st.session_state.messages.append(
+        {"role": "assistant", "content": response.answer, "citations": citations}
+    )

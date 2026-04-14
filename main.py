@@ -1,5 +1,5 @@
-from src.RAG.CleanerScraper import CleanerScraper
 from config import METADATA_SEMANTIC_CHUNKING, WIKI_LINK
+from src.RAG.CleanerScraper import CleanerScraper
 from src.RAG.Generator import generate_answer
 from src.RAG.HybridRetrieval import HybridRetrieval
 from src.RAG.Indexing import create_indexes

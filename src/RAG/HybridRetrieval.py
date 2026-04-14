@@ -12,7 +12,7 @@ from config import (CO_API_KEY, COHERE_RERANK_MODEL, COLLECTION_NAME,
                     VECTOR_PENALTY, VECTOR_STORE_IDX_NAME)
 
 
-class HybridRetrieval:  
+class HybridRetrieval:
     def __init__(self):
         client = MongoClient(MONGO_URI)
         collection = client[DATABASE_NAME][COLLECTION_NAME]
