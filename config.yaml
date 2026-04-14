@@ -58,7 +58,8 @@ indexing:
     type : search
 
 generator:
-  ollama_model : qwen3:1.7b
+  openai_gen_model : gpt-4o-mini
+# ollama_model : qwen3:1.7b; discarded to avoid containers orchestration
 
 
 

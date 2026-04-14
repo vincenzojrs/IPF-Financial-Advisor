@@ -60,4 +60,5 @@ FTS_INDEX_NAME = _cfg["indexing"]["fulltext_index"]["name"]
 FTS_INDEX_TYPE = _cfg["indexing"]["fulltext_index"]["type"]
 
 ## Generator.py
-OLLAMA_MODEL = _cfg["generator"]["ollama_model"]
+# OLLAMA_MODEL = _cfg["generator"]["ollama_model"]
+OPENAI_GEN_MODEL = _cfg["generator"]["openai_gen_model"]
