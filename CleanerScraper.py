@@ -8,20 +8,22 @@ load_dotenv()
 
 class CleanerScraper:
     """
-    The tool to scrape ItaliaPersonalFinance's Wiki
+    The tool to scrape ItaliaPersonalFinance's Wiki.
 
-    Attributes
-        url : str
-            The url of the website whose page to be scraped and cleaned. Default to None
-        sitemap : list of str
-            If already available a list of strings containing urls to be scraped. Default to None
+    Attributes:
+        url (str): The url of the website whose pages are to be scraped and cleaned. Defaults to None.
+        sitemap (list[str]): If already available, a list of URLs to be scraped. Defaults to None.
 
     Methods:
-        create_sitemap():
-            Creates a sitemap by crawling the URL provided at instantiation using TavilyMap
-
+        create_sitemap(max_depth, instructions, allow_external):
+            Creates a sitemap by crawling the URL provided at instantiation using TavilyMap.
         scrape():
-            Extract and clean HTML content each webpage in the sitemap, to preserve relevant content.
+            Extracts and cleans HTML content from each webpage in the sitemap, to preserve relevant content.
+
+    Example:
+        scraper = CleanerScraper(url="https://www.italiapersonalfinance.it")
+        scraper.create_sitemap(max_depth=3, allow_external=False)
+        scraper.scrape()
     """
 
     def __init__(self, url=None, site_map=None):
@@ -30,10 +32,10 @@ class CleanerScraper:
 
     def create_sitemap(
         self,
-        max_depth=3,
-        instructions="Find all blog articles, guides, and educational content pages",
-        allow_external=False,
-    ):
+        max_depth: int = 3,
+        instructions: str = "Find all blog articles, guides, and educational content pages",
+        allow_external: bool = False,
+    ) -> list[str]:
         """
         Creates a sitemap by crawling the URL provided at instantiation using TavilyMap
         The resulting sitemap is stored in self.site_map and returned
@@ -88,7 +90,7 @@ class CleanerScraper:
 
         return pages_soup
 
-    def _return_cleaned_pages(self, pages_soup):
+    def _return_cleaned_pages(self, pages_soup: list[dict]) -> list[dict]:
         """
         Clean articles removing unnecessary tags, links, header, and footer, only keeping body. The function works as below:
             - Withing the same page/url check if
@@ -130,16 +132,13 @@ class CleanerScraper:
                 for tag in article.find_all(tags):
                     text = tag.get_text(" ", strip=True)
                     if text:
-                            paragraph.append(text)
+                        paragraph.append(text)
 
             if not paragraph:
                 print(f"Skipping {url} because no text was found.")
                 continue
 
-            website_clean.append({
-                    "url": url,
-                    "content": "\n\n".join(paragraph)
-                    })
+            website_clean.append({"url": url, "content": "\n\n".join(paragraph)})
 
         return website_clean
 
