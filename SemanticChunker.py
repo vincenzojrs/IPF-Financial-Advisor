@@ -4,7 +4,11 @@ from langchain_mongodb import MongoDBAtlasVectorSearch
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pymongo import MongoClient
-from config import EMBEDDING_MODEL, CHUNK_SIZE_SPLITTER, CHUNK_OVLP_SPLITTER, SEPARATORS_SPLITTER, IS_SEP_RGX_SPLITTER, DATABASE_NAME, VECTOR_STORE_IDX_NAME, OPENAI_API_KEY, MONGO_URI
+
+from config import (CHUNK_OVLP_SPLITTER, CHUNK_SIZE_SPLITTER, COLLECTION_NAME,
+                    DATABASE_NAME, EMBEDDING_MODEL, IS_SEP_RGX_SPLITTER,
+                    MONGO_URI, OPENAI_API_KEY, SEPARATORS_SPLITTER,
+                    VECTOR_STORE_IDX_NAME)
 
 
 class SemanticChunker:
@@ -93,7 +97,8 @@ class SemanticChunker:
         return split_docs
 
     def _store_splits(
-        self, chunks: list[Document], embedding_model, collection_name: str):
+        self, chunks: list[Document], embedding_model, collection_name: str
+    ):
         """
         Open a MongoDB Client, vectorize the chunks, and embedd their metadata and store them in a newly created collection.
 
@@ -159,7 +164,13 @@ class SemanticChunker:
             return 0.0
         return num / denom
 
-    def _semantic_chunking(self, vectors: list[float], list_of_chunks: list[Document], threshold: float, max_chunks: int = 3):
+    def _semantic_chunking(
+        self,
+        vectors: list[float],
+        list_of_chunks: list[Document],
+        threshold: float,
+        max_chunks: int = 3,
+    ):
         """
         Aggregate similar chunks based on relative vectors' similarity.
 
@@ -179,7 +190,7 @@ class SemanticChunker:
                                 'cat',
                                 'lion'
                             ] # where each chunk is a LangChain Document
-                            
+
             vectors = [ [3, 4], [6, 7], [1, 2], [1, 1] ]
             semantic_chunks = self._semantic_chunking = [
                                                             ['dog'],
@@ -200,7 +211,9 @@ class SemanticChunker:
         chunks.append(current_chunk)
         return chunks
 
-    def _merge_semantic_chunks(self, sem_chunks: list[list[Document]]) -> list[Document]:
+    def _merge_semantic_chunks(
+        self, sem_chunks: list[list[Document]]
+    ) -> list[Document]:
 
         # TODO: Enable store multiple urls when aggregating different vectors.
 
@@ -255,5 +268,5 @@ class SemanticChunker:
         split_docs, vectors = self._vectorize_splits(split_docs)
         sem_chunks = self._semantic_chunking(vectors, split_docs, 0.7)
         sem_docs = self._merge_semantic_chunks(sem_chunks)
-        self._store_splits(sem_docs, self.embedding_model, "AfterSemChunking")
+        self._store_splits(sem_docs, self.embedding_model, COLLECTION_NAME)
         return sem_docs
