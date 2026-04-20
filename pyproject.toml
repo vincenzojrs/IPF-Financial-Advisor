@@ -24,5 +24,6 @@ dependencies = [
     "pymongo>=4.16.0",
     "python-dotenv>=1.2.2",
     "requests>=2.33.1",
+    "selenium>=4.43.0",
     "streamlit>=1.56.0",
 ]

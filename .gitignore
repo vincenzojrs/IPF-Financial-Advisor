@@ -232,3 +232,7 @@ __pycache__/
 
 # uv lockfile
 uv.lock
+
+experimenting.ipynb
+
+.DS_Store
