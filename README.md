@@ -13,6 +13,7 @@ The project was broken down in several pieces:
 - Data ingestion and cleaning: web crawling using `TavilyMap` for sitemap creation and `BeautifulSoup` for HTML data scraping;
 - RAG implementation: naive semantic chunking using `NumPy`, vectorization using `OpenAI`, and storing in `MongoDB Atlas`;
 - RAG enhancing: hybrid search using `BM25`, `RRF` for ensembling and reranking using Cross-Encoding;
+- Developing agentic tools into an MCP: *Rent vs. Buy* using Selenium for web page interactions;
 - Building a front-end in `Streamlit`, allowing chat history storage between reruns for each user session, as well as citations rendering;
 - Local containerization using `Docker`;
 - Web hosting using `Google Cloud Platform` and its tools: `Artifact Registry`, `Secret Manager`, and `Google Cloud Run`.
@@ -70,6 +71,18 @@ The two search methods produce two rankings, so an ensembled ranking is created 
  
 Cross-encoding is a technique used to allow the LLM to retrieve only a subset of the most relevant documents to enhance generation performance. Compared to Bi-Encoder, where query and document vectors are encoded separately and their embeddings compared, cross-encoding encodes both the query and the document within the same transformer, resulting in a similarity score between them. The `Cohere Rerank API` was used to perform this step.
  
+## Architectural choices about the first tool realized: *Rent vs. Buy*
+
+In the Italian media, it is common to see people wondering whether to buy a home or pay rent. Here, whilst buying a home usually represents a significant and long-term financial commitment, renting is seen as a waste of money, especially when the rent is higher than a potential mortgage payment.
+The tool calculates whether buying a home is more cost-effective than renting, considering several variables:
+- Full price paid in cash vs. mortgage;
+- Considering alternative investment opportunities;
+- Costs of periodic renovation;
+- Differences in tax treatment depending on certain typical scenarios recognised under Italian law – such as purchasing from private sellers or from developers.
+
+Additionally, by interacting with the Italian Tax Agency’s website, it is possible to determine whether the property’s price is in line with the market for the same area and what a competitive rent would be for a similar property.
+
+The website interaction was implemented using `Selenium`: a Python library that enables interaction with web pages by identifying their components via their XPATHs, and performing actions such as scrolling, clicking, and selecting from a drop-down menu.
  
 # Architectural choices about the front-end
  
