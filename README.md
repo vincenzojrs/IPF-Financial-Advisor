@@ -13,7 +13,7 @@ The project was broken down in several pieces:
 - Data ingestion and cleaning: in the `LangChain` environemnt, web crawling using `TavilyMap` for sitemap creation and `BeautifulSoup` for HTML data scraping;
 - RAG implementation: naive semantic chunking using `NumPy`, vectorization using `OpenAI`, and storing in `MongoDB Atlas`;
 - RAG enhancing: hybrid search using `BM25`, `RRF` for ensembling and reranking using Cross-Encoding;
-- Developing Agentic feature in `LangGraph`: *Rent vs. Buy* using `Selenium` for web page interactions;
+- Developing Agentic feature in `LangGraph`: *Rent vs. Buy* tool using `Playwright` for web page interactions, managing the `State`, and collecting domain user requirements;
 - Building a front-end in `Streamlit`, allowing chat history storage between reruns for each user session, as well as citations rendering;
 - Local containerization using `Docker`;
 - Web hosting using `Google Cloud Platform` and its tools: `Artifact Registry`, `Secret Manager`, and `Google Cloud Run`.
@@ -70,22 +70,46 @@ The two search methods produce two rankings, so an ensembled ranking is created 
 ## Cross-Encoding for Re-Ranking
  
 Cross-encoding is a technique used to allow the LLM to retrieve only a subset of the most relevant documents to enhance generation performance. Compared to Bi-Encoder, where query and document vectors are encoded separately and their embeddings compared, cross-encoding encodes both the query and the document within the same transformer, resulting in a similarity score between them. The `Cohere Rerank API` was used to perform this step.
- 
-# Architectural choices about the first tool realized: *Rent vs. Buy*
 
-In the Italian media, it is common to see people wondering whether to buy a home or pay rent. Here, whilst buying a home usually represents a significant and long-term financial commitment, renting is seen as a waste of money, especially when the rent is higher than a potential mortgage payment.
-The tool calculates whether buying a home is more cost-effective than renting, considering several variables:
-- Full price paid in cash vs. mortgage;
-- Considering alternative investment opportunities;
-- Costs of periodic renovation;
-- Differences in tax treatment depending on certain typical scenarios recognised under Italian law – such as purchasing from private sellers or from developers.
+# The main challange - implementic Agentic feature in `LangGraph`: *Rent vs. Buy* tool using `Playwright` for web page interactions, managing the `State`, and collecting domain user requirements;
 
-Additionally, by interacting with the Italian Tax Agency’s website, it is possible to determine whether the property’s price is in line with the market for the same area and what a competitive rent would be for a similar property.
+The most complex part of the work consisted in equipping the chatbot with agentic capabilities, in addition to those related to context enrichment provided by the RAG. In particular, with the development of the Rent vs. Buy module, it is possible to determine whether, for a given property, it is more convenient to buy or to rent.
 
-The website interaction was implemented using `Selenium`: a Python library that enables interaction with web pages by identifying their components via their XPATHs, and performing actions such as scrolling, clicking, and selecting from a drop-down menu.
+## Domain analysis for the *Rent vs. Buy* calculator
 
-# Architectural choices about LangGraph to orchestrate agentic features:
-_TO DO_
+- I translated domain requirements into technical requirements, studying in particular how taxation changes depending on whether the property is purchased from a developer or from a private seller.
+- I identified the parameters that influence the cost-effectiveness assessment, including the presence of alternative investments, the location of the property in a specific geographic area, and the amortization of purchase costs and periodic maintenance costs.
+
+## Integrating the calculator into the chatbot: from `LangChain` to `LangGraph`
+
+I redesigned the framework by moving from `LangChain` to `LangGraph`, which relies on a graph-based logic in which nodes are points where an input is transformed to produce an output, and edges connect at least two nodes.
+This choice made it possible to satisfy the requirement of keeping a single channel for all user requests with no additional menus or other graphical workarounds, while still supporting heterogeneous features such as *RAG* and *Rent vs. Buy*: every request goes through one single chat field.
+I introduced a routing node in which an LLM autonomously determines whether a query requires the RAG or the calculator, and routes it accordingly.
+
+## Acquiring the inputs: scraping with Playwright
+
+The *Rent vs. Buy* calculator requires inputs from different sources: some are estimates provided directly by the user, while others are chosen by the user among options obtained by scraping the website of the Italian Tax Agency. The website provides "fair" rent fees and prices per sqm, for a given geographical area.
+
+I initially designed the scraping with Selenium, and then implemented it with Playwright, which, unlike the static scraping used for the RAG , allows dynamic interaction with the page. 
+The scraping flow consists in:
+
+```
+Navigate the website -> Identify dropdown selector -> Returns dropdown to user ->
+-> User chooses option -> Select the option -> Click button -> Return data, input needed for Rent vs. Buy
+```
+
+## LangGraph-specific challenges
+
+The implementation of LangGraph required three particular considerations:
+
+- Given two consecutive nodes, the transformation of the previous node is kept in memory, storing the state of the input and output variables throughout the entire graph execution, regardless of whether any single transformation has been completed.
+-  Interrupts are implemented in the nodes to suspend the execution of the graph while waiting for user input.
+- TODO — non-serializable Playwright exception.
+
+TODO
+- User input on Streamlit in the form of a form.
+- Implementation of the return message from the calculate node.
+- Handling the non-serializability exception of the Playwright object within the AgentState.
  
 # Architectural choices about the front-end
  
