@@ -61,6 +61,20 @@ generator:
   openai_gen_model : gpt-4o-mini
 # ollama_model : qwen3:1.7b; discarded to avoid containers orchestration
 
+rvb_calc:
+  min_tax : 1000
+  individual:
+    registry_tax : 0.02
+    mortgage_tax: 50
+    cadastral_tax: 50
+    other_expenses: 50
+  company:
+    vat: 0.04
+    registry_tax : 200
+    mortgage_tax: 200
+    cadastral_tax: 200
+
+
 
 
 

@@ -1,10 +1,10 @@
 from pymongo import MongoClient
 from pymongo.operations import SearchIndexModel
 
-from config import (COLLECTION_NAME, DATABASE_NAME, FTS_INDEX_NAME,
-                    FTS_INDEX_TYPE, MONGO_URI, VECTOR_INDEX_NAME,
-                    VECTOR_INDEX_NDIM, VECTOR_INDEX_PATH, VECTOR_INDEX_SIM,
-                    VECTOR_INDEX_TYPE, VECTOR_INDEX_TYPE_A)
+from src.config import (COLLECTION_NAME, DATABASE_NAME, FTS_INDEX_NAME,
+                        FTS_INDEX_TYPE, MONGO_URI, VECTOR_INDEX_NAME,
+                        VECTOR_INDEX_NDIM, VECTOR_INDEX_PATH, VECTOR_INDEX_SIM,
+                        VECTOR_INDEX_TYPE, VECTOR_INDEX_TYPE_A)
 
 
 def create_indexes() -> list[SearchIndexModel]:

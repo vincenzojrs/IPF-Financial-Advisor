@@ -5,11 +5,11 @@ from langchain_mongodb.retrievers import MongoDBAtlasHybridSearchRetriever
 from langchain_openai import OpenAIEmbeddings
 from pymongo import MongoClient
 
-from config import (CO_API_KEY, COHERE_RERANK_MODEL, COLLECTION_NAME,
-                    DATABASE_NAME, EMBEDDING_KEY, EMBEDDING_MODEL,
-                    FULLTEXT_PENALTY, MONGO_URI, OPENAI_API_KEY,
-                    RELEVANCE_SCORE_FN, SEARCH_INDEX_NAME, TEXT_KEY, TOP_K,
-                    VECTOR_PENALTY, VECTOR_STORE_IDX_NAME)
+from src.config import (CO_API_KEY, COHERE_RERANK_MODEL, COLLECTION_NAME,
+                        DATABASE_NAME, EMBEDDING_KEY, EMBEDDING_MODEL,
+                        FULLTEXT_PENALTY, MONGO_URI, OPENAI_API_KEY,
+                        RELEVANCE_SCORE_FN, SEARCH_INDEX_NAME, TEXT_KEY, TOP_K,
+                        VECTOR_PENALTY, VECTOR_STORE_IDX_NAME)
 
 
 class HybridRetrieval:

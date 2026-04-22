@@ -1,8 +1,11 @@
 from collections import defaultdict
+
 import streamlit as st
-from main import FinancialAdvisorRAG
+
+from src.tools.rag_tool import FinancialAdvisorRAG
 
 st.title("Il financial advisor per pignolazzi!")
+
 
 def render_citations(citations):
     with st.expander("Queste sono le fonti che ho utilizzato:"):
@@ -11,6 +14,7 @@ def render_citations(citations):
             grouped[citation["source_url"]].append(citation["id"])
         for url, ids in grouped.items():
             st.markdown(f"{', '.join(ids)} : {url}")
+
 
 if "rag" not in st.session_state:
     st.session_state.rag = FinancialAdvisorRAG()

@@ -2,9 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 from langchain_tavily import TavilyMap
 
-from config import (ALLOW_EXT_SITEMAP_SCRAPER, ARTICLE_TAG_CLEAN_PAGES,
-                    INSTRUCTIONS_SITEMAP_SCRAPER, MAX_DEPTH_SITEMAP_SCRAPER,
-                    TAGS_CLEAN_PAGES, TAVILY_API_KEY)
+from src.config import (ALLOW_EXT_SITEMAP_SCRAPER, ARTICLE_TAG_CLEAN_PAGES,
+                        INSTRUCTIONS_SITEMAP_SCRAPER,
+                        MAX_DEPTH_SITEMAP_SCRAPER, TAGS_CLEAN_PAGES,
+                        TAVILY_API_KEY)
 
 
 class CleanerScraper:

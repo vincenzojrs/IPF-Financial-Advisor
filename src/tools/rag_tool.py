@@ -1,9 +1,9 @@
-from config import METADATA_SEMANTIC_CHUNKING, WIKI_LINK
-from src.RAG.CleanerScraper import CleanerScraper
-from src.RAG.Generator import generate_answer
-from src.RAG.HybridRetrieval import HybridRetrieval
-from src.RAG.Indexing import create_indexes
-from src.RAG.SemanticChunker import SemanticChunker
+from src.config import METADATA_SEMANTIC_CHUNKING, WIKI_LINK
+from src.tools.RAG.CleanerScraper import CleanerScraper
+from src.tools.RAG.Generator import generate_answer
+from src.tools.RAG.HybridRetrieval import HybridRetrieval
+from src.tools.RAG.Indexing import create_indexes
+from src.tools.RAG.SemanticChunker import SemanticChunker
 
 
 class FinancialAdvisorRAG:
@@ -23,11 +23,3 @@ class FinancialAdvisorRAG:
     def ask(self, query):
         docs = self.retrieval.retrieve(query)
         return generate_answer(query, docs)
-
-
-if __name__ == "__main__":
-    print("Ciao dal tuo financial advisor pignolazzo!")
-    rag = FinancialAdvisorRAG(need_ingestion=False)
-    query = "Che cos'è un ETF?"
-    result = rag.ask(query)
-    print(result)

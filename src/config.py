@@ -2,11 +2,11 @@ import os
 from pathlib import Path
 
 import yaml
-from dotenv import load_dotenv
+from dotenv import find_dotenv, load_dotenv
 
-load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+load_dotenv(find_dotenv())
 
-with open("config.yaml") as f:
+with open(Path(__file__).parent / "config.yaml") as f:
     _cfg = yaml.safe_load(f)
 
 # secrets, in .env
@@ -62,3 +62,15 @@ FTS_INDEX_TYPE = _cfg["indexing"]["fulltext_index"]["type"]
 ## Generator.py
 # OLLAMA_MODEL = _cfg["generator"]["ollama_model"]
 OPENAI_GEN_MODEL = _cfg["generator"]["openai_gen_model"]
+
+RVB_CALC_INDIV_REG_TAX = _cfg["rvb_calc"]["individual"]["registry_tax"]
+RVB_CALC_INDIV_MTG_TAX = _cfg["rvb_calc"]["individual"]["mortgage_tax"]
+RVB_CALC_INDIV_CDT_TAX = _cfg["rvb_calc"]["individual"]["cadastral_tax"]
+RVB_CALC_INDIV_OTH_TAX = _cfg["rvb_calc"]["individual"]["other_expenses"]
+
+RVB_CALC_CPY_VAT = _cfg["rvb_calc"]["company"]["vat"]
+RVB_CALC_CPY_REG_TAX = _cfg["rvb_calc"]["company"]["registry_tax"]
+RVB_CALC_CPY_MTG_TAX = _cfg["rvb_calc"]["company"]["mortgage_tax"]
+RVB_CALC_CPY_CDT_TAX = _cfg["rvb_calc"]["company"]["cadastral_tax"]
+
+RVB_CALC_MIN_TAX = _cfg["rvb_calc"]["min_tax"]

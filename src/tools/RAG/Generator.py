@@ -3,7 +3,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
-from config import OPENAI_API_KEY, OPENAI_GEN_MODEL
+from src.config import OPENAI_API_KEY, OPENAI_GEN_MODEL
 
 # from config import OLLAMA_MODEL
 # from langchain_ollama import ChatOllama

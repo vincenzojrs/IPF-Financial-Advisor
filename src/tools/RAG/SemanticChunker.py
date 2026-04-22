@@ -5,10 +5,10 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pymongo import MongoClient
 
-from config import (CHUNK_OVLP_SPLITTER, CHUNK_SIZE_SPLITTER, COLLECTION_NAME,
-                    DATABASE_NAME, EMBEDDING_MODEL, IS_SEP_RGX_SPLITTER,
-                    MONGO_URI, OPENAI_API_KEY, SEPARATORS_SPLITTER,
-                    VECTOR_STORE_IDX_NAME)
+from src.config import (CHUNK_OVLP_SPLITTER, CHUNK_SIZE_SPLITTER,
+                        COLLECTION_NAME, DATABASE_NAME, EMBEDDING_MODEL,
+                        IS_SEP_RGX_SPLITTER, MONGO_URI, OPENAI_API_KEY,
+                        SEPARATORS_SPLITTER, VECTOR_STORE_IDX_NAME)
 
 
 class SemanticChunker:
