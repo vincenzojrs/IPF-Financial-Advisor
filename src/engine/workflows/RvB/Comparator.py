@@ -4,23 +4,25 @@ from src.config import (RVB_CALC_CPY_CDT_TAX, RVB_CALC_CPY_MTG_TAX,
                         RVB_CALC_INDIV_OTH_TAX, RVB_CALC_INDIV_REG_TAX,
                         RVB_CALC_MIN_TAX)
 
-class Comparator():
+
+class Comparator:
     def __init__(
-            self,
-            purchase_price: float,
-            sqm: int,
-            condo_owner_fees_coeff: float,
-            notary_fees: float,
-            payback_years: int,
-            years_occurring_renovation: int,
-            mortgage_interest_rate: float,
-            price_to_rent_coeff: float,
-            avg_price_sqm: float,
-            cadastral_value_coefficient: float = 2.18,
-            avg_invest_return: float = 0.05,
-            buying_from_individual: bool = True,
-            tax_deduction: float = 0.0):
-        
+        self,
+        purchase_price: float,
+        sqm: int,
+        condo_owner_fees_coeff: float,
+        notary_fees: float,
+        payback_years: int,
+        years_occurring_renovation: int,
+        mortgage_interest_rate: float,
+        price_to_rent_coeff: float,
+        avg_price_sqm: float,
+        cadastral_value_coefficient: float = 2.18,
+        avg_invest_return: float = 0.05,
+        buying_from_individual: bool = True,
+        tax_deduction: float = 0.0,
+    ):
+
         self.purchase_price = purchase_price
         self.sqm = sqm
         self.condo_owner_fees_coeff = condo_owner_fees_coeff
@@ -39,7 +41,7 @@ class Comparator():
         self.investments_returns = purchase_price * avg_invest_return
 
     def calculate_purchasing_expenses(self):
-      
+
         # Estimate condo fees
         self.condo_owner_fees = -(self.cadastral_value * self.condo_owner_fees_coeff)
 
@@ -69,20 +71,32 @@ class Comparator():
         # Calculate mortage fee
         self.mortgage_fee = -(self.purchase_price * self.mortgage_interest_rate)
 
-        self.yearly_purchasing_expenses = self.condo_owner_fees + self.renovation + self.purchasing_expenses + self.investments_returns + self.mortgage_fee
+        self.yearly_purchasing_expenses = (
+            self.condo_owner_fees
+            + self.renovation
+            + self.purchasing_expenses
+            + self.investments_returns
+            + self.mortgage_fee
+        )
 
     def calculating_renting_expenses(self):
         self.fair_rent = self.purchase_price * self.price_to_rent_coeff
         self.yearly_rent = -(self.fair_rent * 12)
-        self.yearly_renting_expenses = self.yearly_rent + self.investments_returns + self.tax_deduction
-    
+        self.yearly_renting_expenses = (
+            self.yearly_rent + self.investments_returns + self.tax_deduction
+        )
+
     def which_convenient(self):
         self.calculate_purchasing_expenses()
         self.calculate_renting_expenses()
-        return "purchasing" if self.yearly_renting_expenses > self.yearly_purchasing_expenses else "renting"
-    
+        return (
+            "purchasing"
+            if self.yearly_renting_expenses > self.yearly_purchasing_expenses
+            else "renting"
+        )
+
     def is_fair_price(self) -> str:
-         
+
         self.fair_price = self.avg_price_sqm * self.sqm
         if self.purchase_price > self.fair_price:
             return "high"

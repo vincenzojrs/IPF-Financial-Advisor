@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import streamlit as st
 
-from src.agent.workflows.rag_tool import FinancialAdvisorRAG
+from src.engine.workflows.rag_tool import FinancialAdvisorRAG
 
 st.title("Il financial advisor per pignolazzi!")
 

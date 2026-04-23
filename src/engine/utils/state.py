@@ -1,4 +1,5 @@
-from typing import Any, Optional, TypedDict
+from typing import Union, Optional, TypedDict
+from src.engine.workflows.RAG.Generator import AnswerWithCitations
 
 
 class AgentState(TypedDict):
@@ -10,4 +11,4 @@ class AgentState(TypedDict):
     municipality: Optional[str]
     zone: Optional[str]
 
-    answer: Optional[Any]
+    answer: Optional[Union [AnswerWithCitations, dict]]

@@ -1,9 +1,9 @@
+from src.engine.workflows.RAG.CleanerScraper import CleanerScraper
+from src.engine.workflows.RAG.Generator import generate_answer
+from src.engine.workflows.RAG.HybridRetrieval import HybridRetrieval
+from src.engine.workflows.RAG.Indexing import create_indexes
+from src.engine.workflows.RAG.SemanticChunker import SemanticChunker
 from src.config import METADATA_SEMANTIC_CHUNKING, WIKI_LINK
-from src.agent.workflows.RAG.CleanerScraper import CleanerScraper
-from src.agent.workflows.RAG.Generator import generate_answer
-from src.agent.workflows.RAG.HybridRetrieval import HybridRetrieval
-from src.agent.workflows.RAG.Indexing import create_indexes
-from src.agent.workflows.RAG.SemanticChunker import SemanticChunker
 
 
 class FinancialAdvisorRAG:
