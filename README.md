@@ -2,8 +2,10 @@
  
 ###### work in progress
  
-TODO: Scope extended
-At the moment we're writing, the scope of this exercise consists in developing a full-stack application in Python, consisting of an Agentic RAG acting like a professional financial advisor. The Agent will be able to retrieve pieces of information from the [subreddit](https://www.reddit.com/r/ItaliaPersonalFinance/) Italian Personal Finance's [Wiki](https://www.italiapersonalfinance.it).
+At the moment we are updating the documentation, the scope of the full-stack GenAI application in Python has grown, from a RAG acting like a professional financial advisor, to incorporate workflows and agentic features.
+
+- The agent is able to retrieve pieces of information from the [subreddit](https://www.reddit.com/r/ItaliaPersonalFinance/) Italian Personal Finance's [Wiki](https://www.italiapersonalfinance.it).
+- The agent is able to calculate whether, based on the user's conditions, what's more convenient, between renting or buying an house.
  
 The aim is to deliver an industry-grade, production-ready piece of Python application, which follows all the best practices for software engineering, coding, data science, and GenAI — from following PEP-8 recommendations, to containerizing software to ensure reproducibility and isolation, to properly cleaning data.
  
@@ -14,11 +16,10 @@ The project was broken down in several pieces:
 - Data ingestion and cleaning: in the `LangChain` environemnt, web crawling using `TavilyMap` for sitemap creation and `BeautifulSoup` for HTML data scraping;
 - RAG implementation: naive semantic chunking using `NumPy`, vectorization using `OpenAI`, and storing in `MongoDB Atlas`;
 - RAG enhancing: hybrid search using `BM25`, `RRF` for ensembling and reranking using Cross-Encoding;
-- Developing Agentic feature in `LangGraph`: *Rent vs. Buy* tool using `Playwright` for web page interactions, managing the `State`, and collecting domain user requirements;
+- Developing workflows in `LangGraph`: `Rent vs. Buy` tool using `Playwright` for web page interactions, managing the `State`, and collecting domain user requirements;
 - Building a front-end in `Streamlit`, allowing chat history storage between reruns for each user session, as well as citations rendering;
 - Local containerization using `Docker`;
 - Web hosting using `Google Cloud Platform` and its tools: `Artifact Registry`, `Secret Manager`, and `Google Cloud Run`.
- 
  
 # Architectural choices about web crawling and data cleaning
  
@@ -72,13 +73,13 @@ The two search methods produce two rankings, so an ensembled ranking is created 
  
 Cross-encoding is a technique used to allow the LLM to retrieve only a subset of the most relevant documents to enhance generation performance. Compared to Bi-Encoder, where query and document vectors are encoded separately and their embeddings compared, cross-encoding encodes both the query and the document within the same transformer, resulting in a similarity score between them. The `Cohere Rerank API` was used to perform this step.
 
-# The main challange - implementic Agentic feature in `LangGraph`: *Rent vs. Buy* tool using `Playwright` for web page interactions, managing the `State`, and collecting domain user requirements;
+# The main challange - implementic workflows in `LangGraph`: *Rent vs. Buy* tool using `Playwright` for web page interactions, managing the `State`, and collecting domain user requirements;
 
-The most complex part of the work consisted in equipping the chatbot with agentic capabilities, in addition to those related to context enrichment provided by the RAG. In particular, with the development of the Rent vs. Buy module, it is possible to determine whether, for a given property, it is more convenient to buy or to rent.
+The most complex part of the work consisted in equipping the chatbot with agentic capabilities, in addition to those related to context enrichment provided by the RAG. In particular, with the development of the *Rent vs. Buy* module, it is possible to determine whether, for a given property, it is more convenient to buy or to rent. It should be noted that the workflow is not a ReAct agent, but consists of a process that is almost entirely deterministic due to the specific nature of web-based interactions. The development of a ReAct agent is, however, envisaged for future development.
 
 ## Domain analysis for the *Rent vs. Buy* calculator
 
-- I translated domain requirements into technical requirements, studying in particular how taxation changes depending on whether the property is purchased from a developer or from a private seller.
+- I translated domain requirements into technical requirements, studying how taxation changes depending on whether the property is purchased from a developer or from a private seller.
 - I identified the parameters that influence the cost-effectiveness assessment, including the presence of alternative investments, the location of the property in a specific geographic area, and the amortization of purchase costs and periodic maintenance costs.
 
 ## Integrating the calculator into the chatbot: from `LangChain` to `LangGraph`
@@ -89,14 +90,15 @@ I introduced a routing node in which an LLM autonomously determines whether a qu
 
 ## Acquiring the inputs: scraping with Playwright
 
-The *Rent vs. Buy* calculator requires inputs from different sources: some are estimates provided directly by the user, while others are chosen by the user among options obtained by scraping the website of the Italian Tax Agency. The website provides "fair" rent fees and prices per sqm, for a given geographical area.
+The *Rent vs. Buy* calculator requires inputs from different sources: some are estimates provided directly by the user, while others are chosen by the user among options obtained by scraping the website of the Italian Tax Agency. The website provides average rent fees and prices per sqm, for a given geographical area. The workflow is able to determine whether the price is fair, compared to the average, and what would be a fair rent to pay for the same house.
 
-I initially designed the scraping with Selenium, and then implemented it with Playwright, which, unlike the static scraping used for the RAG , allows dynamic interaction with the page. 
+While a first iteration was realized using Selenium, the scraping feature was finally implemented using Playwright, which, unlike the static scraping used for the RAG, allows dynamic interaction with the page. 
 The scraping flow consists in:
 
 ```
 Navigate the website -> Identify dropdown selector -> Returns dropdown to user ->
--> User chooses option -> Select the option -> Click button -> Return data, input needed for Rent vs. Buy
+-> User chooses option -> Select the option -> Click button -> 
+-> Return data, input needed for Rent vs. Buy
 ```
 
 ## LangGraph-specific challenges
