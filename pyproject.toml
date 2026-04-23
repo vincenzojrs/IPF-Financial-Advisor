@@ -23,6 +23,7 @@ dependencies = [
     "lxml>=6.0.2",
     "numpy>=2.4.4",
     "playwright>=1.58.0",
+    "pyclean>=3.6.0",
     "pydantic>=2.12.5",
     "pymongo>=4.16.0",
     "python-dotenv>=1.2.2",

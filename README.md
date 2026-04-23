@@ -2,6 +2,7 @@
  
 ###### work in progress
  
+TODO: Scope extended
 At the moment we're writing, the scope of this exercise consists in developing a full-stack application in Python, consisting of an Agentic RAG acting like a professional financial advisor. The Agent will be able to retrieve pieces of information from the [subreddit](https://www.reddit.com/r/ItaliaPersonalFinance/) Italian Personal Finance's [Wiki](https://www.italiapersonalfinance.it).
  
 The aim is to deliver an industry-grade, production-ready piece of Python application, which follows all the best practices for software engineering, coding, data science, and GenAI — from following PEP-8 recommendations, to containerizing software to ensure reproducibility and isolation, to properly cleaning data.
