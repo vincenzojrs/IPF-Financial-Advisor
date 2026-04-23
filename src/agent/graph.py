@@ -1,6 +1,6 @@
 from langgraph.graph import END, START, StateGraph
-from src.agent.nodes import (municipality_node, province_node, rag_node, router_node, zone_and_uses_node, human_input_node, extract_parameters, calculate)
-from src.agent.state import AgentState
+from src.agent.utils.nodes import (municipality_node, province_node, rag_node, router_node, zone_and_uses_node, human_input_node, extract_parameters, calculate)
+from src.agent.utils.state import AgentState
 
 def routing_logic(state):
     return "rag" if state["route"] == "rag" else "mutuo"

@@ -1,9 +1,9 @@
 from langchain_openai import ChatOpenAI
 from langgraph.types import interrupt
 from statistics import mean
-from src.tools.rag_tool import FinancialAdvisorRAG
-from src.tools.rvb_tool import Comparator
-from src.tools.RvB import WebSession
+from src.agent.workflows.rag_tool import FinancialAdvisorRAG
+from src.agent.workflows.rvb_tool import Comparator
+from src.agent.workflows.RvB import WebSession
 
 llm = ChatOpenAI(model="gpt-5.4-mini")
 

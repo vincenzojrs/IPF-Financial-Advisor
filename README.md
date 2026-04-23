@@ -115,7 +115,9 @@ TODO
 - Handling the non-serializability exception of the Playwright object within the AgentState.
  
 # Architectural choices about the front-end
- 
+
+###### outdated: refers to release v0.1; to be adapted once v0.2 released
+
 `Streamlit` was used as the front-end framework, given its simplicity and native chat elements: `chat_message`, which renders a container storing chat history messages, and `chat_input`, which renders a widget handling input prompting.
  
 Crucial was the `session_state` functionality in Streamlit: variables that store user-specific data, allowing persistence across reruns for every user session. Each user–system pair of messages was stored in a `session_state` variable that rendered the whole chat history — this solution solved the disappearance of previous chat messages when a new message was prompted.
@@ -126,6 +128,8 @@ The citations, whenever present, were rendered into an `expander` container to i
  
  
 # Architectural choices about local deployment in Docker
+
+###### outdated: refers to release v0.1; to be adapted once v0.2 released
  
 The first local release of the project was packaged using `Docker`. The usage of a local model like `qwen3` would have required the creation and orchestration of multiple containers. However, for the first deployment, we switched to `OpenAI GPT`, cloud-based.
  
@@ -133,6 +137,8 @@ A `Dockerfile` created an image from a lightweight Python base with the `uv` pac
  
  
 # Architectural choices about web deployment in GCP
+
+###### outdated: refers to release v0.1; to be adapted once v0.2 released
  
 While possibly subject to changes for future deployments, it was decided to build an image locally and push it to the web.
  
