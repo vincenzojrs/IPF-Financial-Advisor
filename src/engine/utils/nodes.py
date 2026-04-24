@@ -3,9 +3,9 @@ from statistics import mean
 from langchain_openai import ChatOpenAI
 from langgraph.types import interrupt
 
-from src.engine.workflows.rag_tool import FinancialAdvisorRAG
+from src.engine.workflows.rag_flow import FinancialAdvisorRAG
 from src.engine.workflows.RvB.WebSession import PlaywrightSession
-from src.engine.workflows.rvb_tool import RvBTool
+from src.engine.workflows.rvb_flow import RvBTool
 
 llm = ChatOpenAI(model="gpt-5.4-mini")
 
@@ -29,25 +29,13 @@ def rag_node(state):
     rag = FinancialAdvisorRAG()
     result = rag.ask(state["query"])
 
-    return {"answer": result}
+    return {"answer": result.answer}
 
 
 def human_input_node(state):
+    payload = interrupt("")
 
-    user_inputs = {
-        "purchase_price": interrupt(""),
-        "sqm": interrupt(""),
-        "condo_owner_fees_coeff": interrupt(""),
-        "notary_fees": interrupt(""),
-        "payback_years": interrupt(""),
-        "years_occurring_renovation": interrupt(""),
-        "mortgage_interest_rate": interrupt(""),
-        "avg_invest_return": interrupt(""),
-        "buying_from_individual": interrupt(""),
-        "tax_deduction": interrupt(""),
-    }
-
-    return {"parameters": user_inputs}
+    return {"parameters": payload}
 
 
 def scraping_parameters(state):
@@ -110,3 +98,15 @@ def scraping_parameters(state):
 def calculate(state):
     tool = RvBTool(**state["parameters"])
     return { "answer" : tool.analyze() }
+
+def elaborate(state):
+    raw_answer = state["answer"]
+    refined_answer = llm.invoke(f"""
+        You'll receive a dictionary containing recurring costs about purchasing and renting an house, as well as an assessment, whether which is is more convenient, and how much someone would save.
+        Please, craft an effective summary, considering that you're a financial advisor.
+
+        Query: {raw_answer}
+        """
+    )
+    return {"answer": refined_answer.content}
+    

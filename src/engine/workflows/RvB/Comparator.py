@@ -19,7 +19,7 @@ class Comparator:
         avg_price_sqm: float,
         cadastral_value_coefficient: float = 2.18,
         avg_invest_return: float = 0.05,
-        buying_from_individual: bool = True,
+        buying_from_individual: str = "Privato",
         tax_deduction: float = 0.0,
     ):
 
@@ -49,14 +49,14 @@ class Comparator:
         self.renovation = -(self.cadastral_value / 3) / self.years_occurring_renovation
 
         #  Taxes change according to the nature of the vendor
-        if self.buying_from_individual:
+        if self.buying_from_individual == "Privato":
             registry_tax = RVB_CALC_INDIV_REG_TAX * self.cadastral_value
             mortgage_tax = RVB_CALC_INDIV_MTG_TAX
             cadastral_tax = RVB_CALC_INDIV_CDT_TAX
             other_expenses = RVB_CALC_INDIV_OTH_TAX
             self.taxes = registry_tax + mortgage_tax + cadastral_tax + other_expenses
 
-        else:
+        elif self.buying_from_individual == "Azienda":
             vat = RVB_CALC_CPY_VAT * self.purchase_price
             registry_tax = RVB_CALC_CPY_REG_TAX
             mortgage_tax = RVB_CALC_CPY_MTG_TAX
@@ -79,7 +79,7 @@ class Comparator:
             + self.mortgage_fee
         )
 
-    def calculating_renting_expenses(self):
+    def calculate_renting_expenses(self):
         self.fair_rent = self.purchase_price * self.price_to_rent_coeff
         self.yearly_rent = -(self.fair_rent * 12)
         self.yearly_renting_expenses = (
@@ -87,14 +87,10 @@ class Comparator:
         )
 
     def which_convenient(self):
-        self.calculate_purchasing_expenses()
-        self.calculate_renting_expenses()
-        return (
-            "purchasing"
-            if self.yearly_renting_expenses > self.yearly_purchasing_expenses
-            else "renting"
-        )
-
+        self.convenience = {}
+        self.convenience["What's convenient?"] = "buying" if self.yearly_renting_expenses > self.yearly_purchasing_expenses else "renting"
+        self.convenience["How much saving?"] = abs(self.yearly_renting_expenses - self.yearly_purchasing_expenses)
+        
     def is_fair_price(self) -> str:
 
         self.fair_price = self.avg_price_sqm * self.sqm

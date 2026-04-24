@@ -2,34 +2,32 @@ from collections import defaultdict
 
 import streamlit as st
 
-from src.engine.workflows.rag_tool import FinancialAdvisorRAG
+from src.engine.orchestrator import Graph
+from src.app.rvb_frontend import FormRvb
+from langgraph.types import Command
+
 
 st.title("Il financial advisor per pignolazzi!")
 
 
-def render_citations(citations):
-    with st.expander("Queste sono le fonti che ho utilizzato:"):
-        grouped = defaultdict(list)
-        for citation in citations:
-            grouped[citation["source_url"]].append(citation["id"])
-        for url, ids in grouped.items():
-            st.markdown(f"{', '.join(ids)} : {url}")
-
-
-if "rag" not in st.session_state:
-    st.session_state.rag = FinancialAdvisorRAG()
+if "orchestrator" not in st.session_state:
+    st.session_state.orchestrator = Graph()
+    st.session_state.orchestrator_config = { "configurable": 
+                                                {
+                                                    "thread_id" : 1
+                                                }
+                                            }
 
 # Initiate chat history, if not exist
 if "messages" not in st.session_state:
     st.session_state.messages = []
+    
+
 
 # Display chat history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-
-        if message["role"] == "assistant" and "citations" in message:
-            render_citations(message["citations"])
 
 # Create chat input bar, and append prompt to chat history
 if prompt := st.chat_input("Come posso aiutarti?"):
@@ -37,12 +35,16 @@ if prompt := st.chat_input("Come posso aiutarti?"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    with st.chat_message("assistant"):
-        response = st.session_state.rag.ask(prompt)
-        st.markdown(response.answer)
-        citations = [c.model_dump() for c in response.citations]
-        render_citations(citations)
-
+    response = st.session_state.orchestrator.invoke({"query": prompt}, config = st.session_state.orchestrator_config)
+    if response["route"] == "mutuo" and "interrupt" in response:
+        form = FormRvb()
+        st.session_state.orchestrator.invoke(Command(resume = form.user_inputs), config = st.session_state.orchestrator_config)
+        st.session_state.orchestrator.invoke(Command(resume = 'NAPOLI'), config = st.session_state.orchestrator_config)
+        st.session_state.orchestrator.invoke(Command(resume = 'NAPOLI'), config = st.session_state.orchestrator_config)
+    else:
+        answer = response.get("answer")
+        with st.chat_message("assistant"):
+            st.markdown(response)
     st.session_state.messages.append(
-        {"role": "assistant", "content": response.answer, "citations": citations}
+        {"role": "assistant", "content": response}
     )

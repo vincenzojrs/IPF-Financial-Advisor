@@ -14,7 +14,7 @@ class RvBTool:
         avg_price_sqm: float,
         cadastral_value_coefficient: float = 2.18,
         avg_invest_return: float = 0.05,
-        buying_from_individual: bool = True,
+        buying_from_individual: str = "Privato",
         tax_deduction: float = 0.0
     ):
         
@@ -36,7 +36,8 @@ class RvBTool:
         
     def analyze(self):
         self._comparator.calculate_purchasing_expenses()
-        self._comparator.calculating_renting_expenses()
+        self._comparator.calculate_renting_expenses()
+        self._comparator.which_convenient()
         
         return {
             "answer": {
@@ -59,22 +60,8 @@ class RvBTool:
                     "total_net_flow": self._comparator.yearly_renting_expenses,
                 },
                 "Summary": {
-                    "Convenience": (
-                        "purchasing"
-                        if self._comparator.yearly_renting_expenses
-                        > self._comparator.yearly_purchasing_expenses
-                        else "renting"
-                    ),
-                    "Saving": abs(
-                        self._comparator.yearly_purchasing_expenses
-                        - self._comparator.yearly_renting_expenses
-                    ),
-                },
+                    "convenience": self._comparator.convenience["What's convenient?"],
+                    "saving": self._comparator.convenience["How much saving?"]
+                }
             }
-    }
-    
-    def compare(self) -> str:
-        return self._comparator.which_convenient()
-    
-    def evaluate_price(self) -> str:
-        return self._comparator.is_fair_price()            
+    }  

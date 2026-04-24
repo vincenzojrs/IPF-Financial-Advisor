@@ -73,7 +73,7 @@ The two search methods produce two rankings, so an ensembled ranking is created 
  
 Cross-encoding is a technique used to allow the LLM to retrieve only a subset of the most relevant documents to enhance generation performance. Compared to Bi-Encoder, where query and document vectors are encoded separately and their embeddings compared, cross-encoding encodes both the query and the document within the same transformer, resulting in a similarity score between them. The `Cohere Rerank API` was used to perform this step.
 
-# The main challange - implementic workflows in `LangGraph`: *Rent vs. Buy* tool using `Playwright` for web page interactions, managing the `State`, and collecting domain user requirements;
+# The main challange - implementic workflows in `LangGraph`: *Rent vs. Buy* tool using `Playwright` for web page interactions and collecting domain user requirements;
 
 The most complex part of the work consisted in equipping the chatbot with agentic capabilities, in addition to those related to context enrichment provided by the RAG. In particular, with the development of the *Rent vs. Buy* module, it is possible to determine whether, for a given property, it is more convenient to buy or to rent. It should be noted that the workflow is not a ReAct agent, but consists of a process that is almost entirely deterministic due to the specific nature of web-based interactions. The development of a ReAct agent is, however, envisaged for future development.
 
@@ -85,7 +85,7 @@ The most complex part of the work consisted in equipping the chatbot with agenti
 ## Integrating the calculator into the chatbot: from `LangChain` to `LangGraph`
 
 I redesigned the framework by moving from `LangChain` to `LangGraph`, which relies on a graph-based logic in which nodes are points where an input is transformed to produce an output, and edges connect at least two nodes.
-This choice made it possible to satisfy the requirement of keeping a single channel for all user requests with no additional menus or other graphical workarounds, while still supporting heterogeneous features such as *RAG* and *Rent vs. Buy*: every request goes through one single chat field.
+This also made possibile to satisfy the requirement of keeping a single channel for all user requests with no additional menus or other graphical workarounds, while still supporting heterogeneous features such as *RAG* and *Rent vs. Buy*: every request goes through one single chat field.
 I introduced a routing node in which an LLM autonomously determines whether a query requires the RAG or the calculator, and routes it accordingly.
 
 ## Acquiring the inputs: scraping with Playwright
