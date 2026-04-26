@@ -33,7 +33,7 @@ def rag_node(state):
 
 
 def human_input_node(state):
-    payload = interrupt("")
+    payload = interrupt({"step": "human_input"})
 
     return {"parameters": payload}
 
@@ -41,35 +41,21 @@ def human_input_node(state):
 def scraping_parameters(state):
     with PlaywrightSession() as page:
         choices = page.locator("//select[@id = 'pr']").all_inner_texts()[0].split("\n")
-        province = interrupt("")  # <- ritorna alla UI la variabile choices
+        province = interrupt({"step": "provincia", "choices": choices})  # <- ritorna alla UI la variabile choices
 
         page.select_option("//select[@id = 'pr']", label=province)
         page.click("//input[@id = 'bottone_invio']")
 
-        choices = (
-            page.locator("//select[@id = 'co' and @name = 'co']")
-            .all_inner_texts()[0]
-            .split("\n")
-        )
-        municipality = interrupt("")  # <- ritorna alla UI la variabile choices
+        choices = (page.locator("//select[@id = 'co' and @name = 'co']").all_inner_texts()[0].split("\n"))
+        municipality = interrupt({"step": "municipalità", "choices": choices})  # <- ritorna alla UI la variabile choices
 
         page.select_option("//select[@id = 'co' and @name = 'co']", label=municipality)
         page.click("//input[@id = 'bottone_invio']")
-
-        # TODO: Enable block below once sent to frontend
         
-        # choices = (
-        #     page.locator(
-        #         "//select[@id = 'linkzonastrada' and @name = 'linkzonastrada']"
-        #     )
-        #     .all_inner_texts()[0]
-        #     .split("\n")
-        # )
-        # zone = interrupt("")
+        choices = (page.locator("//select[@id = 'linkzonastrada' and @name = 'linkzonastrada']").all_inner_texts()[0].split("\n"))
+        zone = interrupt({"step": "zona", "choices": choices})
 
-        page.select_option(
-            "//select[@id = 'linkzonastrada' and @name = 'linkzonastrada']", index = 1
-        )
+        page.select_option("//select[@id = 'linkzonastrada' and @name = 'linkzonastrada']", label = zone)
         page.click("//input[@id = 'bottone_invio']")
 
         page.select_option(
@@ -88,10 +74,8 @@ def scraping_parameters(state):
                 / mean([float(values[2]), float(values[3])]),
             },
             "province": province,
-            "municipality": municipality
-            
-            # TODO: Enable block below once sent to frontend
-            # "zone": zone,
+            "municipality": municipality,
+            "zone": zone,
         }
 
 
