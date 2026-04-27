@@ -1,7 +1,8 @@
 from collections import defaultdict
 import streamlit as st
 from src.engine.orchestrator import invoke_graph
-from src.app.rvb_widgets import FormRvb, PMZSelection, render_user_message, render_assistant_response
+from src.app.widgets import FormRvb, PMZSelection
+from src.app.functions import render_user_message, render_assistant_response
 from langgraph.types import Command
 
 st.title("Il financial advisor per pignolazzi!")

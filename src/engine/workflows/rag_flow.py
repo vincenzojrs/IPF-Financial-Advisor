@@ -1,9 +1,9 @@
+from src.config import METADATA_SEMANTIC_CHUNKING, WIKI_LINK
 from src.engine.workflows.RAG.CleanerScraper import CleanerScraper
 from src.engine.workflows.RAG.Generator import generate_answer
 from src.engine.workflows.RAG.HybridRetrieval import HybridRetrieval
 from src.engine.workflows.RAG.Indexing import create_indexes
 from src.engine.workflows.RAG.SemanticChunker import SemanticChunker
-from src.config import METADATA_SEMANTIC_CHUNKING, WIKI_LINK
 
 
 class FinancialAdvisorRAG:

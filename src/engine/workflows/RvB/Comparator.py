@@ -88,9 +88,15 @@ class Comparator:
 
     def which_convenient(self):
         self.convenience = {}
-        self.convenience["What's convenient?"] = "buying" if self.yearly_renting_expenses > self.yearly_purchasing_expenses else "renting"
-        self.convenience["How much saving?"] = abs(self.yearly_renting_expenses - self.yearly_purchasing_expenses)
-        
+        self.convenience["What's convenient?"] = (
+            "buying"
+            if self.yearly_renting_expenses > self.yearly_purchasing_expenses
+            else "renting"
+        )
+        self.convenience["How much saving?"] = abs(
+            self.yearly_renting_expenses - self.yearly_purchasing_expenses
+        )
+
     def is_fair_price(self) -> str:
 
         self.fair_price = self.avg_price_sqm * self.sqm

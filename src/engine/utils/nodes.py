@@ -41,21 +41,37 @@ def human_input_node(state):
 def scraping_parameters(state):
     with PlaywrightSession() as page:
         choices = page.locator("//select[@id = 'pr']").all_inner_texts()[0].split("\n")
-        province = interrupt({"step": "Provincia", "choices": choices})  # <- ritorna alla UI la variabile choices
+        province = interrupt(
+            {"step": "Provincia", "choices": choices}
+        )  # <- ritorna alla UI la variabile choices
 
         page.select_option("//select[@id = 'pr']", label=province)
         page.click("//input[@id = 'bottone_invio']")
 
-        choices = (page.locator("//select[@id = 'co' and @name = 'co']").all_inner_texts()[0].split("\n"))
-        municipality = interrupt({"step": "Municipalità", "choices": choices})  # <- ritorna alla UI la variabile choices
+        choices = (
+            page.locator("//select[@id = 'co' and @name = 'co']")
+            .all_inner_texts()[0]
+            .split("\n")
+        )
+        municipality = interrupt(
+            {"step": "Municipalità", "choices": choices}
+        )  # <- ritorna alla UI la variabile choices
 
         page.select_option("//select[@id = 'co' and @name = 'co']", label=municipality)
         page.click("//input[@id = 'bottone_invio']")
-        
-        choices = (page.locator("//select[@id = 'linkzonastrada' and @name = 'linkzonastrada']").all_inner_texts()[0].split("\n"))
+
+        choices = (
+            page.locator(
+                "//select[@id = 'linkzonastrada' and @name = 'linkzonastrada']"
+            )
+            .all_inner_texts()[0]
+            .split("\n")
+        )
         zone = interrupt({"step": "Zona", "choices": choices})
 
-        page.select_option("//select[@id = 'linkzonastrada' and @name = 'linkzonastrada']", label = zone)
+        page.select_option(
+            "//select[@id = 'linkzonastrada' and @name = 'linkzonastrada']", label=zone
+        )
         page.click("//input[@id = 'bottone_invio']")
 
         page.select_option(
@@ -63,7 +79,12 @@ def scraping_parameters(state):
         )
         page.click("//input[@id = 'bottone_invio']")
 
-        values = page.get_by_role('row').filter(has = page.get_by_text('Abitazioni civili')).get_by_role('cell').all_inner_texts()
+        values = (
+            page.get_by_role("row")
+            .filter(has=page.get_by_text("Abitazioni civili"))
+            .get_by_role("cell")
+            .all_inner_texts()
+        )
         values = [value.replace(",", ".") for value in values]
 
         return {
@@ -81,7 +102,8 @@ def scraping_parameters(state):
 
 def calculate(state):
     tool = RvBTool(**state["parameters"])
-    return { "answer" : tool.analyze() }
+    return {"answer": tool.analyze()}
+
 
 def elaborate(state):
     raw_answer = state["answer"]
@@ -109,7 +131,5 @@ def elaborate(state):
         Crea una sintesi efficace e suggerisci all'utente cosa fare per risparmiare.
         Fornisci una risposta completa e non proporre scenari, calcoli, tabelle, informazioni aggiuntive e non chiedere nulla all'utente.
         Query: {raw_answer}
-        """
-    )
+        """)
     return {"answer": refined_answer.content}
-    

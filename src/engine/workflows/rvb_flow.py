@@ -1,5 +1,6 @@
 from src.engine.workflows.RvB.Comparator import Comparator
 
+
 class RvBTool:
     def __init__(
         self,
@@ -15,9 +16,9 @@ class RvBTool:
         cadastral_value_coefficient: float = 2.18,
         avg_invest_return: float = 0.05,
         buying_from_individual: str = "Privato",
-        tax_deduction: float = 0.0
+        tax_deduction: float = 0.0,
     ):
-        
+
         self._comparator = Comparator(
             purchase_price,
             sqm,
@@ -31,14 +32,14 @@ class RvBTool:
             cadastral_value_coefficient,
             avg_invest_return,
             buying_from_individual,
-            tax_deduction
+            tax_deduction,
         )
-        
+
     def analyze(self):
         self._comparator.calculate_purchasing_expenses()
         self._comparator.calculate_renting_expenses()
         self._comparator.which_convenient()
-        
+
         return {
             "answer": {
                 "Purchasing": {
@@ -61,7 +62,7 @@ class RvBTool:
                 },
                 "Summary": {
                     "convenience": self._comparator.convenience["What's convenient?"],
-                    "saving": self._comparator.convenience["How much saving?"]
-                }
+                    "saving": self._comparator.convenience["How much saving?"],
+                },
             }
-    }  
+        }

@@ -1,13 +1,14 @@
-from langgraph.graph import END, START, StateGraph
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph import END, START, StateGraph
 
-
-from src.engine.utils.nodes import (calculate, human_input_node, rag_node,
-                                   router_node, scraping_parameters, elaborate)
+from src.engine.utils.nodes import (calculate, elaborate, human_input_node,
+                                    rag_node, router_node, scraping_parameters)
 from src.engine.utils.state import AgentState
+
 
 def routing_logic(state):
     return "rag" if state["route"] == "rag" else "mutuo"
+
 
 graph = StateGraph(AgentState)
 graph.add_node("router_node", router_node)
@@ -34,7 +35,8 @@ graph.add_edge("elaborate", END)
 
 memory = InMemorySaver()
 
-graph_runnable = graph.compile(checkpointer = memory)
-    
-def invoke_graph(prompt, config = None):
-    return graph_runnable.invoke(prompt, config = config)
+graph_runnable = graph.compile(checkpointer=memory)
+
+
+def invoke_graph(prompt, config=None):
+    return graph_runnable.invoke(prompt, config=config)
