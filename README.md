@@ -1,7 +1,5 @@
 # RAG IPF Wiki
  
-###### work in progress
- 
 At the moment we are updating the documentation, the scope of the full-stack GenAI application in Python has grown, from a RAG acting like a professional financial advisor, to incorporate workflows and agentic features.
 
 - The agent is able to retrieve pieces of information from the [subreddit](https://www.reddit.com/r/ItaliaPersonalFinance/) Italian Personal Finance's [Wiki](https://www.italiapersonalfinance.it).
@@ -10,135 +8,128 @@ At the moment we are updating the documentation, the scope of the full-stack Gen
 The aim is to deliver an industry-grade, production-ready piece of Python application, which follows all the best practices for software engineering, coding, data science, and GenAI — from following PEP-8 recommendations, to containerizing software to ensure reproducibility and isolation, to properly cleaning data.
  
 While we acknowledge there are much more direct solutions to implement some functionalities, such as using an already-built MCP to retrieve data, most of the features, as well as layers of abstraction and error handling, were included for learning purposes, coded *from scratch and entirely by a human*, both front-end and back-end.
+
+Currently, two releases are available:
+- v0.1, released on the 14th of April 2026, which implemented the `RAG`, a `Streamlit UI`, containerization in `Docker` and deployment in `Google Cloud Platform`;
+- v0.2, released on the 27th of April 2026, enabling a `LangGraph` workflow using a human-in-the-loop design, as well as web scraping and interaction in `Playwright` for `Rent vs. Buy` calculator.
+
+The application relies on several layers:
  
-The project was broken down in several pieces:
- 
-- Data ingestion and cleaning: in the `LangChain` environemnt, web crawling using `TavilyMap` for sitemap creation and `BeautifulSoup` for HTML data scraping;
+- Data ingestion and cleaning: in the `LangChain` environment, web crawling using `TavilyMap` for sitemap creation and `BeautifulSoup` for HTML data scraping;
 - RAG implementation: naive semantic chunking using `NumPy`, vectorization using `OpenAI`, and storing in `MongoDB Atlas`;
-- RAG enhancing: hybrid search using `BM25`, `RRF` for ensembling and reranking using Cross-Encoding;
-- Developing workflows in `LangGraph`: `Rent vs. Buy` tool using `Playwright` for web page interactions, managing the `State`, and collecting domain user requirements;
-- Building a front-end in `Streamlit`, allowing chat history storage between reruns for each user session, as well as citations rendering;
+- RAG hardening: hybrid search using `BM25`, `RRF` for ensembling and reranking using Cross-Encoding;
+- Developing workflows in `LangGraph` with `human-in-the-loop`: `Rent vs. Buy` tool using `Playwright` for web page interactions and collecting domain user requirements;
+- Building a front-end in `Streamlit`, allowing chat history storage between reruns for each user session, as well as citations rendering, and state management for persistance;
 - Local containerization using `Docker`;
 - Web hosting using `Google Cloud Platform` and its tools: `Artifact Registry`, `Secret Manager`, and `Google Cloud Run`.
  
-# Architectural choices about web crawling and data cleaning
- 
-The pipeline started with retrieving and cleaning data to optimize model performance.
- 
-`TavilyCrawl` and `TavilyExtract`, while initially evaluated, were considered inadequate solutions for several reasons:
- 
-- Both tools could have consumed paid API tokens for a relatively simple use case;
-- `TavilyCrawl` often returned a restricted number of links, even after adjusting prompt and parameters;
-- `TavilyExtract` offered limited customization, capping at 20 URLs per batch on the free plan.
- 
-Ultimately, `TavilyMap` was used only to generate a comprehensive sitemap, and the HTML content of the mapped webpages was requested and scraped via the `requests` and `BeautifulSoup` modules.
- 
-By looking at the data, we found that the main content of the pages was enclosed in an HTML `<article>` tag, and within that, inside `<p>` and `<h#>` tags. `BeautifulSoup` was used to keep only relevant content based on the aforementioned criteria.
- 
-A `CleanerScraper` class was created, gathering data extraction and cleaning functionalities.
+# Architectural choices about web crawling and data cleaning (v0.1)
+
+The purpose of `Retrieval-Augmumented Generation` (`RAG`) consists in delivering to the model some additional data to enlarge its knoweldge. The better the data delivered, the better the model and RAG performance.
+
+It was decided to enalarge the knowledge of the model using the [subreddit](https://www.reddit.com/r/ItaliaPersonalFinance/) Italian Personal Finance's [Wiki](https://www.italiapersonalfinance.it): a website having an online-encyclopedia strucuture, where each page contains in-depth analysis for a specific topic.
+
+After inspecting the returned webpages using the `requests` module, we found that the main content of the pages was consistently enclosed in an HTML `<article>` tag, and within that, inside `<p>` and `<h#>` tags. Then, `BeautifulSoup` was used to keep only relevant content based on the aforementioned criteria. The `CleanerScraper` class was created, gathering data extraction and cleaning functionalities.
  
  
-# Architectural choices about semantic chunking, embeddings, and storage
+# Architectural choices about RAG implementation (v0.1)
  
-Embedding a text consists in translating human language into something that the machine can elaborate. Embedding a piece of human-language information consists in creating numerical representations of words, sentences, or whole paragraphs. Such numerical representations are vectors — lists of numbers where each number refers to some semantic feature of the word, like genre, number, color, etc.
+Embedding a text consists in translating human language into something that the machine can elaborate. Embedding a piece of human-language information consists in creating numerical representations of words, sentences, or whole paragraphs. Such numerical representations are vectors — lists of numbers where each number refers to some semantic feature of the word, like genre, number, color, etc. RAG consist in enlarging the context of the query, computing similarity between embedded user input and embedded additional data. The higher the similarity, the higher the chance the query refers to the data, which will be used to enlarge the knowledge of the model.
  
-A common practice before embedding a document consists in dividing — or *chunking* — the whole text, sometimes referred to as the *corpus*, into smaller bits called *chunks*. Embedding sentences or paragraphs rather than individual words allows each vector to incorporate both word-level information and its broader context.
+A common practice before embedding a document to optimize performance consists in dividing — or *chunking* — the whole text, sometimes referred to as the *corpus*, into smaller bits called *chunks*. Embedding sentences or paragraphs rather than individual words allows each vector to incorporate both word-level information and its broader context.
  
 After chunking, the sentences are *translated* into vectors via an embedding model and usually stored in a vector database.
  
-## Semantic chunking
+## Semantic chunking (v0.1)
  
-The Wiki was well organized, and its pages concise, brief and direct. A semantic chunking approach was immediately recognized to be an overkill solution. However, it was still chosen and coded for educational purposes.
+The Wiki was well organized, and its pages concise, brief and direct, for that reason semantic chunking approach might have be considered an overkill solution. However, it was still chosen and coded for educational purposes.
  
-Semantic chunking consists of splitting the original text into chunks using punctuation or line breaks, assuming that each sentence — delimited by strong punctuation or a line break — carries a complete meaning. The similarity between each vector and its consecutive one was iteratively calculated, and once it exceeded a certain threshold, a new, larger chunk was created by aggregation. The goal was to obtain a smaller number of chunks containing mutually coherent information, in order to improve embedding performance.
+Semantic chunking consists of splitting the original text into chunks using punctuation or line breaks, assuming that each sentence — delimited by strong punctuation or a line break — carries a complete meaning. The similarity between each vector and its consecutive one was iteratively calculated, and once it exceeded a certain threshold, a new, larger chunk was created by aggregation. The goal was to obtain a smaller number of chunks containing mutually coherent information.
+
  
-- A dedicated `SemanticChunker` class was created, which splits the corpus based on punctuation marks while preserving useful metadata such as the reference link for each chunk and their identification ID. The splitter used was a `RecursiveTextSplitter` from `LangChain`.
-- Using an `OpenAI` embedding model, each chunk was vectorized and, leveraging the `NumPy` library, the cosine similarity was computed for each pair of consecutive chunks.
-- Once the text chunks are created, new embeddings are created and stored in `MongoDB Atlas`.
+- The splitting by punctuation was realized thanks to `RecursiveTextSplitter` from `LangChain`;
+- Using an `OpenAI` embedding model, each chunk was vectorized and, leveraging the `NumPy` library, the cosine similarity was computed for each pair of consecutive chunks;
+- Once the text chunks are created, new embeddings are created and stored in `MongoDB Atlas`;
+- The `SemanticChunker` class incorporates the whole tool.
  
+## RAG Hardening: Hybrid Search using BM25 (v0.1)
  
-# Architectural choices about hybrid search, RRF, and Re-Ranking
+Hybrid search consists of an ensembling method that combines the advantages of `Vector Search` (`VS`) — the approach implemented to find similar vectors using cosine similarity — with `Full-text Search` (`FTS`), a retrieval method that deems a document relevant according to the occurrence of the query terms within it.
  
-Several layers of improving RAG performance were implemented: hybrid search, RRF, and reranking.
- 
-## Hybrid Search using BM25
- 
-Hybrid search consists of an ensembling method that combines the advantages of vector search (VS) — the approach implemented to find similar vectors using cosine similarity — with full-text search (FTS), a retrieval method that deems a document relevant according to the occurrence of the query terms within it.
- 
-While VS scores relevancy based on cosine similarity, `Best Match 25` (`BM25`) was implemented to calculate similarity scores for FTS. `BM25` extends the features of the more traditional Tf-IDF algorithm, which scores the relevancy of documents for a query of words based on their occurrence in the corpus. Like `Tf-IDF`, `BM25` positively scores documents where a word occurs most frequently, and scales down the score if the word occurs in many documents. `BM25` introduces document length normalization, promoting smaller documents, and term frequency saturation, tweaking the influence of term frequency in the similarity score.
+While VS scores relevancy was based on cosine similarity, `Best Match 25` (`BM25`) was implemented to calculate similarity scores for `FTS`. `BM25` extends the features of the more traditional Tf-IDF algorithm, which scores the relevancy of documents for a query of words based on their occurrence in the corpus. Like `Tf-IDF`, `BM25` positively scores documents where a word occurs most frequently, and scales down the score if the word occurs in many documents. `BM25` introduces document length normalization, promoting smaller documents, and term frequency saturation, tweaking the influence of term frequency in the similarity score.
  
 The two search methods produce two rankings, so an ensembled ranking is created using a `Reciprocal Rank Fusion` (`RRF`) algorithm, natively implemented via `MongoDB Atlas`. `RRF` combines rankings from two sources by summing the reciprocals of each document's rank across both methods, weighted by a constant. The higher a document is ranked by different scoring algorithms, the higher it will appear in the final ranking.
  
-## Cross-Encoding for Re-Ranking
+## Cross-Encoding for Re-Ranking (v0.1)
  
-Cross-encoding is a technique used to allow the LLM to retrieve only a subset of the most relevant documents to enhance generation performance. Compared to Bi-Encoder, where query and document vectors are encoded separately and their embeddings compared, cross-encoding encodes both the query and the document within the same transformer, resulting in a similarity score between them. The `Cohere Rerank API` was used to perform this step.
+`Cross-encoding` is a technique used to allow the LLM to retrieve only a subset of the most relevant documents to enhance generation performance. Compared to `Bi-Encoder`, where query and document vectors are encoded separately and their embeddings compared (for VS), `Cross-encoding` encodes both the query and the document within the same transformer, resulting in a similarity score between them. The `Cohere Rerank API` was used to perform this step.
 
-# The main challange - implementic workflows in `LangGraph`: *Rent vs. Buy* tool using `Playwright` for web page interactions and collecting domain user requirements;
+# Implementing workflows in `LangGraph` with `human-in-the-loop`: `Rent vs. Buy` tool using `Playwright` for web page interactions and collecting domain user requirements (v0.2)
 
-The most complex part of the work consisted in equipping the chatbot with agentic capabilities, in addition to those related to context enrichment provided by the RAG. In particular, with the development of the *Rent vs. Buy* module, it is possible to determine whether, for a given property, it is more convenient to buy or to rent. It should be noted that the workflow is not a ReAct agent, but consists of a process that is almost entirely deterministic due to the specific nature of web-based interactions. The development of a ReAct agent is, however, envisaged for future development.
+The scope of `v0.2` consisted in equipping the chatbot with agentic capabilities. In particular, with the development of the *Rent vs. Buy* module, it is possible to determine the convenience buying or renting any given property. It should be noted that the workflow is not a ReAct agent, but consists of a process that is almost entirely deterministic due to the specific nature of web-based interactions. The development of a ReAct agent is, however, envisaged for future development. 
 
-## Domain analysis for the *Rent vs. Buy* calculator
+At a router node upstream of the graph, an LLM determines the topic of the query: if it is a factual question, the RAG branch will be activated; if it concerns the convenience of buying a house, the branch of the graph relating to `Rent vs. Buy` will be activated.
 
-- I translated domain requirements into technical requirements, studying how taxation changes depending on whether the property is purchased from a developer or from a private seller.
-- I identified the parameters that influence the cost-effectiveness assessment, including the presence of alternative investments, the location of the property in a specific geographic area, and the amortization of purchase costs and periodic maintenance costs.
+![graph](assets/graph.jpg)
 
-## Integrating the calculator into the chatbot: from `LangChain` to `LangGraph`
+Calculations are based on Prof. Paolo Coletti's [video](https://youtu.be/mvsyyxsFrYA?si=0E2AxClDcqNHf12e) "Acquistare prima casa o affitto?". The video shows a basic calculator in excel to determine whether it's more convenient to buy an house, or renting one. The *Rent vs. Buy* calculator we designed, implements such features in Python and enlarges the scope, introducing additional variables like the presence of alternative investments, italian taxation according to the nature of the seller, the location of the property in a specific geographic area, and the amortization of purchase costs and periodic maintenance costs.
 
-I redesigned the framework by moving from `LangChain` to `LangGraph`, which relies on a graph-based logic in which nodes are points where an input is transformed to produce an output, and edges connect at least two nodes.
-This also made possibile to satisfy the requirement of keeping a single channel for all user requests with no additional menus or other graphical workarounds, while still supporting heterogeneous features such as *RAG* and *Rent vs. Buy*: every request goes through one single chat field.
-I introduced a routing node in which an LLM autonomously determines whether a query requires the RAG or the calculator, and routes it accordingly.
+## Acquiring the input: scraping with Playwright and human feedback using HITL (v0.2)
 
-## Acquiring the inputs: scraping with Playwright
+The *Rent vs. Buy* calculator requires inputs from different sources: some figures are provided directly by the user, while others are chosen by the user among options obtained by scraping the website of the Italian Tax Agency. The website provides average renting fees and purchasing prices per sqm, for a given geographical area. The workflow is able to determine whether the price is fair, compared to the average, and what would be a fair rent to pay for the same house, for any given location.
 
-The *Rent vs. Buy* calculator requires inputs from different sources: some are estimates provided directly by the user, while others are chosen by the user among options obtained by scraping the website of the Italian Tax Agency. The website provides average rent fees and prices per sqm, for a given geographical area. The workflow is able to determine whether the price is fair, compared to the average, and what would be a fair rent to pay for the same house.
+While a first iteration was realized using `Selenium`, the scraping feature was finally implemented using `Playwright`, which, unlike the static scraping used for the `RAG`, allows dynamic interaction with the page. 
+The flow consists in:
 
-While a first iteration was realized using Selenium, the scraping feature was finally implemented using Playwright, which, unlike the static scraping used for the RAG, allows dynamic interaction with the page. 
-The scraping flow consists in:
+![scraping_flow](assets/seqchart_scraping.png)
 
-```
-Navigate the website -> Identify dropdown selector -> Returns dropdown to user ->
--> User chooses option -> Select the option -> Click button -> 
--> Return data, input needed for Rent vs. Buy
-```
+The `interrupt` module in `langgraph.types` allows you to interrupt the execution of a graph at a specific point, returning to the frontend any payload passed as an argument. In this specific case, the payload consists of the options from which the user can select their preference. The `Command` module allows you to resume execution by selecting the preferred option as `resume`. 
 
-## LangGraph-specific challenges
+**To fix**: as shown in the chart above, the state of the Playwright session is not maintained between interruptions, so the browser must be initialised each time. `v0.3` will maintain session persistence to reduce latency.
 
-The implementation of LangGraph required three particular considerations:
-
-- Given two consecutive nodes, the transformation of the previous node is kept in memory, storing the state of the input and output variables throughout the entire graph execution, regardless of whether any single transformation has been completed.
--  Interrupts are implemented in the nodes to suspend the execution of the graph while waiting for user input.
-- TODO — non-serializable Playwright exception.
-
-TODO
-- User input on Streamlit in the form of a form.
-- Implementation of the return message from the calculate node.
-- Handling the non-serializability exception of the Playwright object within the AgentState.
  
-# Architectural choices about the front-end
-
-###### outdated: refers to release v0.1; to be adapted once v0.2 released
+# Architectural choices about the front-end (v0.2)
 
 `Streamlit` was used as the front-end framework, given its simplicity and native chat elements: `chat_message`, which renders a container storing chat history messages, and `chat_input`, which renders a widget handling input prompting.
- 
-Crucial was the `session_state` functionality in Streamlit: variables that store user-specific data, allowing persistence across reruns for every user session. Each user–system pair of messages was stored in a `session_state` variable that rendered the whole chat history — this solution solved the disappearance of previous chat messages when a new message was prompted.
- 
-It was one of our first uses of the walrus operator `:=`, as commonly seen in the `Streamlit` documentation, which assigns a value to a variable — in our specific case, the input to the prompt variable — and checks if it is not `None`.
- 
-The citations, whenever present, were rendered into an `expander` container to increase both credibility and readability.
- 
- 
-# Architectural choices about local deployment in Docker
 
-###### outdated: refers to release v0.1; to be adapted once v0.2 released
- 
-The first local release of the project was packaged using `Docker`. The usage of a local model like `qwen3` would have required the creation and orchestration of multiple containers. However, for the first deployment, we switched to `OpenAI GPT`, cloud-based.
- 
-A `Dockerfile` created an image from a lightweight Python base with the `uv` package manager installed. The `Dockerfile` exposed port 8080 to reach `Streamlit`, instead of the default 8501, as per the `Google Cloud Run` docs, to make one image compatible with the web hosting environment as well.
- 
- 
-# Architectural choices about web deployment in GCP
+Although v0.1 UI implementation went smoothly, thanks to outputs consistency from the backend, the biggest challenge for v0.2 was a mindset shift: learning to keep the UI completely agnostic from the backend's conditional logic. Instead of hardcoding rendering scenario like "if A is selected, render B" into the rendering layer, the UI simply reflects what it receives from the backend. A further layer of complexity came from Streamlit's volatility: every user interaction let the UI re-renders completely, forgetting interaction history and any previously rendered widgets, unless they are explicitly persisted `via session_state`, `Streamlit`'s mechanism for maintaining state across reruns.
 
-###### outdated: refers to release v0.1; to be adapted once v0.2 released
+Below is some pseudocode illustrating the approach used to render different widgets depending on the backend’s responses. Note that, although the backend requires the rendering of certain widgets to be sequential and dependent on the rendering of others, the frontend is completely agnostic to this logic and simply displays different widgets depending on the messages received from the backend.
+
+
+```
+/app.py
+
+IMPORT STREAMLIT AS ST
+
+IF LAST RESPONSE IS "INTERRUPT" AND INTERRUPT STEP IS "FIRST STEP":
+    RENDER FORM
+    IF CLICK SUBMIT AND RERUN APP:
+        STORE DATA
+        DISPLAY WIDGET DATA AND SAVE WIDGET IN MEMORY
+        STORE "I CLICKED SUBMIT IN THE PAST RERUN"
+
+    IF "I CLICKED SUBMIT IN THE PAST RERUN"
+        RESUME GRAPH WITH STORED DATA
+        DISPLAY GRAPH ANSWER AND SAVE WIDGET ANSWER IN MEMORY
+        STORE "I DIDN'T CLICK SUBMIT IN THE PAST RERUN"
+
+IF LAST RESPONSE IS "INTERRUPT" AND INTERRUPT STEP IS "SECOND STEP":
+...
+
+>>> streamlit run app.py
+```
+
+**To fix:** While the citations rendering was implemented for v0.1, and rendered into an `expander` container to increase both credibility and readability, they were lifted in v0.2, and foreseeton to be reimplemented in v0.3
+ 
+ 
+# Architectural choices about local deployment in Docker (v0.2)
+ 
+The first local release of the project was packaged using `Docker`
+A `Dockerfile` created an image from a lightweight Python base with the `uv` package manager installed. `Playwright` dependecies installation commands were included and port 8080 was exposed to reach `Streamlit`, instead of the default 8501, as per the `Google Cloud Run` docs, to make one image compatible with the web hosting environment as well.
+ 
+ 
+# Architectural choices about web deployment in GCP (v0.1)
  
 While possibly subject to changes for future deployments, it was decided to build an image locally and push it to the web.
  

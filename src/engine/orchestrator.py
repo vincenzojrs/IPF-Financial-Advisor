@@ -1,8 +1,6 @@
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
-
-from src.engine.utils.nodes import (calculate, elaborate, human_input_node,
-                                    rag_node, router_node, scraping_parameters)
+from src.engine.utils.nodes import calculate, elaborate, human_input_node, rag_node, router_node, scraping_parameters
 from src.engine.utils.state import AgentState
 
 
@@ -37,6 +35,7 @@ memory = InMemorySaver()
 
 graph_runnable = graph.compile(checkpointer=memory)
 
+print(graph_runnable.get_graph().draw_ascii())
 
 def invoke_graph(prompt, config=None):
     return graph_runnable.invoke(prompt, config=config)
