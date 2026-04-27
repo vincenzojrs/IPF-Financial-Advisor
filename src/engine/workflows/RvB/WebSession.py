@@ -9,7 +9,7 @@ class PlaywrightSession:
 
     def __enter__(self):
         self.playwright = sync_playwright().start()
-        self.browser = self.playwright.chromium.launch(headless=False, slow_mo=2000)
+        self.browser = self.playwright.chromium.launch(headless=True, slow_mo=1500)
         self.page = self.browser.new_page()
         self.page.goto(
             "https://www1.agenziaentrate.gov.it/servizi/Consultazione/ricerca.htm"
