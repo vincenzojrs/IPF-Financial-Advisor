@@ -5,7 +5,7 @@ from src.engine.utils.state import AgentState
 
 
 def routing_logic(state):
-    return "rag" if state["route"] == "rag" else "mutuo"
+    return "rag" if state["route"] == "rag" else "rvb"
 
 
 graph = StateGraph(AgentState)
@@ -21,7 +21,7 @@ graph.add_node("elaborate", elaborate)
 
 graph.add_edge(START, "router_node")
 graph.add_conditional_edges(
-    "router_node", routing_logic, {"rag": "rag_node", "mutuo": "human_input_node"}
+    "router_node", routing_logic, {"rag": "rag_node", "rvb": "human_input_node"}
 )
 
 graph.add_edge("rag_node", END)

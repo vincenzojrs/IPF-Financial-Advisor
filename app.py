@@ -7,6 +7,9 @@ from langgraph.types import Command
 
 st.title("Il financial advisor per pignolazzi!")
 
+# Define variables to be persistent across reruns
+
+# config is necessary to work with interrupts
 if "orchestrator_config" not in st.session_state:
     st.session_state.orchestrator_config = {
         "configurable": {
@@ -44,34 +47,60 @@ if "zona" not in st.session_state:
 if "zona_submitted" not in st.session_state:
     st.session_state.zona_submitted = False   
 
-
+# Display chat history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+# Check existence of prompt
 if prompt := st.chat_input("Come posso aiutarti?"):
+    
+    # Append the prompt in the chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
+    
+    # Display the last message
     with st.chat_message("user"):
         st.markdown(prompt)
 
+    # Invoke the graph using the prompt
     response = invoke_graph({"query": prompt}, config=st.session_state.orchestrator_config)
+    
+    # Make response persistent across reruns
     st.session_state.last_response = response
     
+    # Render response
     render_assistant_response(response)
 
+# Check which interrupt; if interrupt is "Parameteri"
 if st.session_state.last_response is not None and "__interrupt__" in st.session_state.last_response and st.session_state.last_response["__interrupt__"][0].value["step"] == "Parametri":
+    
+    # Display input form
     choices = FormRvb()
 
+    # If form submitted
     if choices.submitted:
+        
+        # Returns a peristent variable saying "I clicked on submit in the previous run"
         st.session_state.form_submitted = True
+        
+        # Make user input persistent
         st.session_state.user_input = choices.user_inputs
+        
+        # Render user input
         render_user_message("Parametri:", choices.user_inputs)
 
+    # If in the previous run the user clicked on submit
     if st.session_state.form_submitted:
+        # Pass the user inputs in the graph
         response = invoke_graph(Command(resume=st.session_state.user_input), config=st.session_state.orchestrator_config)
         
+        # Make the response persistent
         st.session_state.last_response = response
+        
+        # Returns a peristent variable saying "I did not click on submit in the previous run"
         st.session_state.form_submitted = False
+        
+        # Render output
         render_assistant_response(response)
 
 if st.session_state.last_response is not None and "__interrupt__" in st.session_state.last_response and st.session_state.last_response["__interrupt__"][0].value["step"] == "Provincia":

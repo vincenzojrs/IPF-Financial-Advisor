@@ -13,19 +13,20 @@ llm = ChatOpenAI(model="gpt-5.4-mini")
 def router_node(state):
     query = state["query"]
     route = llm.invoke(f"""
-        Decide whether this query requires:
-        - RAG (Financial information)
-        - MUTUO (Mortgage simulation)
+                        Decide whether the following query:
+                            - RAG: Is a notional question, and therefore requires the use of a RAG
+                            - RVB: Is a question concerning the purchase of a house or the assessment of a mortgage
+                        QUERY: {query}
 
-        Query: {query}
-
-        Return only RAG or MUTUO
-        """).content.strip().lower()
+                        Return only RAG or RVB
+                        """).content.strip().lower()
 
     return {"route": route}
 
 
 def rag_node(state):
+    """Invoke the retriever using query"""
+    
     rag = FinancialAdvisorRAG()
     result = rag.ask(state["query"])
 
@@ -33,6 +34,8 @@ def rag_node(state):
 
 
 def human_input_node(state):
+    """Ask human for parameters needed for RvB calculations"""
+    
     payload = interrupt({"step": "Parametri"})
 
     return {"parameters": payload}
@@ -43,7 +46,7 @@ def scraping_parameters(state):
         choices = page.locator("//select[@id = 'pr']").all_inner_texts()[0].split("\n")
         province = interrupt(
             {"step": "Provincia", "choices": choices}
-        )  # <- ritorna alla UI la variabile choices
+        ) 
 
         page.select_option("//select[@id = 'pr']", label=province)
         page.click("//input[@id = 'bottone_invio']")
@@ -55,7 +58,7 @@ def scraping_parameters(state):
         )
         municipality = interrupt(
             {"step": "Municipalità", "choices": choices}
-        )  # <- ritorna alla UI la variabile choices
+        )
 
         page.select_option("//select[@id = 'co' and @name = 'co']", label=municipality)
         page.click("//input[@id = 'bottone_invio']")

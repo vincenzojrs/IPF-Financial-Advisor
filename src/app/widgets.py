@@ -22,7 +22,7 @@ class FormRvb:
                     value=0.005,
                     min_value=0.0,
                     max_value=0.01,
-                    help="Se il valore catastale è 100'000€ e 500€ sono le spese annuali di condomin_valueio a carico del proprietario, allora il valore è 0.005",
+                    help="Se il valore catastale è 100'000€ e 500€ sono le spese annuali di condominio a carico del proprietario, allora il valore è 0.005",
                 )
                 self.user_inputs["notary_fees"] = st.number_input(
                     "Spese notarili", min_value=0, max_value=5000, step=200, value=1000
@@ -40,7 +40,7 @@ class FormRvb:
                     max_value=50,
                     step=10,
                     value=40,
-                    help="Si è stimato che un immobile perda il 30 %% del suo valore ogni 40 anni.",
+                    help="Si è stimato che un immobile perda il 30 % del suo valore ogni 40 anni.",
                 )
                 self.user_inputs["mortgage_interest_rate"] = st.number_input(
                     "Tasso di interesse del mutuo. Assume valore 0 se l'acquisto è avvenuto in contanti",

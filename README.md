@@ -40,7 +40,7 @@ A common practice before embedding a document to optimize performance consists i
  
 After chunking, the sentences are *translated* into vectors via an embedding model and usually stored in a vector database.
  
-## Semantic chunking (v0.1)
+## Semantic chunking
  
 The Wiki was well organized, and its pages concise, brief and direct, for that reason semantic chunking approach might have be considered an overkill solution. However, it was still chosen and coded for educational purposes.
  
@@ -52,7 +52,7 @@ Semantic chunking consists of splitting the original text into chunks using punc
 - Once the text chunks are created, new embeddings are created and stored in `MongoDB Atlas`;
 - The `SemanticChunker` class incorporates the whole tool.
  
-## RAG Hardening: Hybrid Search using BM25 (v0.1)
+## RAG Hardening: Hybrid Search using BM25
  
 Hybrid search consists of an ensembling method that combines the advantages of `Vector Search` (`VS`) — the approach implemented to find similar vectors using cosine similarity — with `Full-text Search` (`FTS`), a retrieval method that deems a document relevant according to the occurrence of the query terms within it.
  
@@ -60,13 +60,14 @@ While VS scores relevancy was based on cosine similarity, `Best Match 25` (`BM25
  
 The two search methods produce two rankings, so an ensembled ranking is created using a `Reciprocal Rank Fusion` (`RRF`) algorithm, natively implemented via `MongoDB Atlas`. `RRF` combines rankings from two sources by summing the reciprocals of each document's rank across both methods, weighted by a constant. The higher a document is ranked by different scoring algorithms, the higher it will appear in the final ranking.
  
-## Cross-Encoding for Re-Ranking (v0.1)
+## Cross-Encoding for Re-Ranking
  
 `Cross-encoding` is a technique used to allow the LLM to retrieve only a subset of the most relevant documents to enhance generation performance. Compared to `Bi-Encoder`, where query and document vectors are encoded separately and their embeddings compared (for VS), `Cross-encoding` encodes both the query and the document within the same transformer, resulting in a similarity score between them. The `Cohere Rerank API` was used to perform this step.
 
 # Implementing workflows in `LangGraph` with `human-in-the-loop`: `Rent vs. Buy` tool using `Playwright` for web page interactions and collecting domain user requirements (v0.2)
 
-The scope of `v0.2` consisted in equipping the chatbot with agentic capabilities. In particular, with the development of the *Rent vs. Buy* module, it is possible to determine the convenience buying or renting any given property. It should be noted that the workflow is not a ReAct agent, but consists of a process that is almost entirely deterministic due to the specific nature of web-based interactions. The development of a ReAct agent is, however, envisaged for future development. 
+The scope of `v0.2` consisted in equipping the chatbot with agentic capabilities. In particular, with the development of the *Rent vs. Buy* module, it is possible to determine the convenience buying or renting any given property. 
+**Please note:** It should be noted that the workflow is not a ReAct agent, but consists of a process that is almost entirely deterministic due to the specific nature of web-based interactions. The development of a ReAct agent is, however, envisaged for future development. 
 
 At a router node upstream of the graph, an LLM determines the topic of the query: if it is a factual question, the RAG branch will be activated; if it concerns the convenience of buying a house, the branch of the graph relating to `Rent vs. Buy` will be activated.
 
@@ -74,11 +75,11 @@ At a router node upstream of the graph, an LLM determines the topic of the query
 
 Calculations are based on Prof. Paolo Coletti's [video](https://youtu.be/mvsyyxsFrYA?si=0E2AxClDcqNHf12e) "Acquistare prima casa o affitto?". The video shows a basic calculator in excel to determine whether it's more convenient to buy an house, or renting one. The *Rent vs. Buy* calculator we designed, implements such features in Python and enlarges the scope, introducing additional variables like the presence of alternative investments, italian taxation according to the nature of the seller, the location of the property in a specific geographic area, and the amortization of purchase costs and periodic maintenance costs.
 
-## Acquiring the input: scraping with Playwright and human feedback using HITL (v0.2)
+## Acquiring the input: scraping with Playwright and human feedback using HITL
 
 The *Rent vs. Buy* calculator requires inputs from different sources: some figures are provided directly by the user, while others are chosen by the user among options obtained by scraping the website of the Italian Tax Agency. The website provides average renting fees and purchasing prices per sqm, for a given geographical area. The workflow is able to determine whether the price is fair, compared to the average, and what would be a fair rent to pay for the same house, for any given location.
 
-While a first iteration was realized using `Selenium`, the scraping feature was finally implemented using `Playwright`, which, unlike the static scraping used for the `RAG`, allows dynamic interaction with the page. 
+While a first iteration was realized using `Selenium`, the scraping feature was finally implemented using `Playwright`, which, unlike the static scraping used for the `RAG`, allows dynamic interaction with the page. Webpage elements were identified thanks to their `XPATH`s
 The flow consists in:
 
 ![scraping_flow](assets/seqchart_scraping.png)
@@ -88,7 +89,7 @@ The `interrupt` module in `langgraph.types` allows you to interrupt the executio
 **To fix**: as shown in the chart above, the state of the Playwright session is not maintained between interruptions, so the browser must be initialised each time. `v0.3` will maintain session persistence to reduce latency.
 
  
-# Architectural choices about the front-end (v0.2)
+# Architectural choices about the front-end in Streamlit (v0.2)
 
 `Streamlit` was used as the front-end framework, given its simplicity and native chat elements: `chat_message`, which renders a container storing chat history messages, and `chat_input`, which renders a widget handling input prompting.
 
@@ -146,3 +147,15 @@ Security -> Database & Network Access -> Network Access -> IP Access List -> ADD
 - Allowing the developer account to access secrets, following the Google [documentation](https://docs.cloud.google.com/secret-manager/docs/manage-access-to-secrets);
 - Pushing the Docker image to `Artifact Registry` following the Google [documentation](https://docs.cloud.google.com/artifact-registry/docs/docker/store-docker-container-images#create);
 - Running the container in `Cloud Run`, following this [tutorial](https://medium.com/@ntepp.marcus/deploy-your-side-project-in-minutes-a-beginners-guide-to-google-cloud-run-artifact-registry-f5475240595f).
+
+
+# Open points for v0.3
+- Improving docstrings and comments for v0.2 to ensure reporducibility and understanding;
+- Adding an helper in UI listing possible tools;
+- Adding a "Reproducibility" paragraph, listing possible approach;
+- Adding "Use of AI" paragraph, assessing AI use for the development project;
+- Defining and developing agentic features or replacing current architecture with ReAct's;
+- Rendering RAG citations in UI streamlit;
+- Making Playwright session persistence across interrupts;
+- Considering multicontainer architecture for 0.3;
+- Deployment of v0.3 in GCP.
