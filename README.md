@@ -22,6 +22,9 @@ The application relies on several layers:
 - Building a front-end in `Streamlit`, allowing chat history storage between reruns for each user session, as well as citations rendering, and state management for persistance;
 - Local containerization using `Docker`;
 - Web hosting using `Google Cloud Platform` and its tools: `Artifact Registry`, `Secret Manager`, and `Google Cloud Run`.
+
+# Demo
+![Demo for v0.2](assets/demo_v0.2.gif)
  
 # Architectural choices about web crawling and data cleaning (v0.1)
 
@@ -150,7 +153,7 @@ Security -> Database & Network Access -> Network Access -> IP Access List -> ADD
 
 
 # Open points for v0.3
-- Improving docstrings and comments for v0.2 to ensure reporducibility and understanding;
+- Improving docstrings and comments for v0.2 to ensure reproducibility and understanding;
 - Adding an helper in UI listing possible tools;
 - Adding a "Reproducibility" paragraph, listing possible approach;
 - Adding "Use of AI" paragraph, assessing AI use for the development project;
