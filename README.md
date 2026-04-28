@@ -24,7 +24,7 @@ The application relies on several layers:
 - Web hosting using `Google Cloud Platform` and its tools: `Artifact Registry`, `Secret Manager`, and `Google Cloud Run`.
 
 # Demo
-<img src="assets/demo_v0.2.gif" height="275">
+<img src="assets/demo_v0.2.gif" height="400">
  
 # Architectural choices about web crawling and data cleaning (v0.1)
 
