@@ -6,6 +6,14 @@ from src.app.functions import render_user_message, render_assistant_response
 from langgraph.types import Command
 
 st.title("Il financial advisor per pignolazzi!")
+st.info("""
+             Poni qualunque domanda all'agente Pignolazzi.
+             
+             Prova con "che cos'è un'azione?" o "a cosa serve un'obbligazione": ti risponderà attingendo alla conoscenza di Italia Personal Finance.
+             
+             Inoltre, ha anche a disposizione un tool a cui potrà ricorrere se gli chiedi informazioni relative alla convenienza dell acquisto di una casa.
+             """,
+             icon="ℹ️")
 
 # Define variables to be persistent across reruns
 

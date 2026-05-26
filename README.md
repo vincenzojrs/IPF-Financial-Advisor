@@ -25,6 +25,7 @@ The application relies on several layers:
 
 # Demo
 <img src="assets/demo_v0.2.gif" height="400">
+
  
 # Architectural choices about web crawling and data cleaning (v0.1)
 
@@ -135,27 +136,54 @@ A `Dockerfile` created an image from a lightweight Python base with the `uv` pac
  
 # Architectural choices about web deployment in GCP (v0.1)
  
-While possibly subject to changes for future deployments, it was decided to build an image locally and push it to the web.
- 
-The main steps for web deployment consisted in:
- 
-- Temporarily allowing web traffic to the `MongoDB Atlas` server so that `Google Cloud Run` can reach it for RAG:
- 
-```
-go to https://cloud.mongodb.com
-Security -> Database & Network Access -> Network Access -> IP Access List -> ADD IP ADDRESS (0.0.0.0/0)
-```
- 
-- Storing secrets, like API keys, following the Google documentation about [creating a secret](https://docs.cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#gcloud_1) and [adding a value to a secret](https://docs.cloud.google.com/secret-manager/docs/add-secret-version). Given the small number of secrets, those were entered manually;
-- Allowing the developer account to access secrets, following the Google [documentation](https://docs.cloud.google.com/secret-manager/docs/manage-access-to-secrets);
-- Pushing the Docker image to `Artifact Registry` following the Google [documentation](https://docs.cloud.google.com/artifact-registry/docs/docker/store-docker-container-images#create);
-- Running the container in `Cloud Run`, following this [tutorial](https://medium.com/@ntepp.marcus/deploy-your-side-project-in-minutes-a-beginners-guide-to-google-cloud-run-artifact-registry-f5475240595f).
+While possibly subject to changes for future deployments, it was decided to build an image locally and push it to the web using `Google Cloud Platform`, particularly, `Google Cloud Run` and `Google Artifact Registry`.
 
+# Reproducibility
+
+The following steps illustrate how to reproduce the script:
+- Create a new empty folder and open the folder path in a terminal.
+- In the terminal, run the following commands:
+   ```
+   pip install uv
+   git clone https://github.com/vincenzojrs/IPF-Financial-Advisor/
+   cd IPF-Financial-Advisor
+   uv sync
+   playwright install chromium
+   ```
+- Follow the [guide](https://www.geeksforgeeks.org/mongodb/creating-and-deploying-an-atlas-cluster-in-mongodb/) to create a Cluster on MongoDB Atlas.
+- Follow the [guide](https://community.openai.com/t/how-to-generate-openai-api-key/401363) to generate your OpenAI API keys. Add €5 to your OpenAI account balance.
+- Follow the [guide](https://dashboard.cohere.com/api-keys) to generate your Cohere API keys.
+- Create a Tavily account, then go to the dashboard and navigate to the **API Keys** section. Create a new API key.
+- Create a file named `.env` in the working directory containing the API keys for the services mentioned above:
+   ```
+   MONGO_URI=123456789
+   TAVILY_API_KEY=ABCDEFG
+   OPENAI_API_KEY=987654321
+   CO_API_KEY=HGFEDCBA
+   ```
+- To run the script locally, navigate to the project working directory in the terminal and type:
+   ```
+   streamlit run app.py
+   ```
+- To deploy locally using the existing Dockerfile, follow the [guide starting from the "Building our Docker image" section](https://depot.dev/blog/docker-build-image#building-our-docker-image).
+- To run the image, open a terminal in the working directory and execute:
+    ```bash
+    docker run --env-file .env -p 8090:8080  image-name
+    ```
+- To deploy the script on GCP, the main steps are:
+    - Temporarily allow web traffic to the MongoDB Atlas server, so that Google Cloud Run can reach it for RAG:
+      - Go to [https://cloud.mongodb.com](https://cloud.mongodb.com);
+      - Navigate to **Security → Network Access → IP Access List**;
+      - Click **ADD IP ADDRESS** and enter `0.0.0.0/0`;
+    - Store secrets (such as API keys) following the Google documentation on creating a secret and adding a value. Given the small number of secrets, these were entered manually;
+    - Grant the developer account access to secrets, following the Google documentation;
+    - Push the Docker image to Artifact Registry, following the Google documentation;
+    - Run the container on Cloud Run, following [this tutorial](https://depot.dev/blog/docker-build-image#building-our-docker-image).
 
 # Open points for v0.3
 - Improving docstrings and comments for v0.2 to ensure reproducibility and understanding;
-- Adding an helper in UI listing possible tools;
-- Adding a "Reproducibility" paragraph, listing possible approach;
+- Adding an helper in UI listing possible tools; ✅
+- Adding a "Reproducibility" paragraph, listing possible approach; ✅
 - Adding "Use of AI" paragraph, assessing AI use for the development project;
 - Defining and developing agentic features or replacing current architecture with ReAct's;
 - Rendering RAG citations in UI streamlit;

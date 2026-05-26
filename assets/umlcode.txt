@@ -1,0 +1,33 @@
+@startuml
+actor user
+participant streamlit
+participant langgraph
+participant playwright
+
+user -> streamlit : query
+streamlit -> langgraph : start execution + query
+langgraph -> playwright : instantiate session + xpath list option1
+playwright -> langgraph : list option1
+langgraph -> playwright : close session
+langgraph -> langgraph : interrupt execution
+langgraph -> streamlit : list option1
+streamlit -> user : option1
+
+user -> streamlit : option1
+streamlit -> langgraph : option1
+langgraph -> playwright : instantiate session + option 1 + xpath list option2
+playwright -> langgraph : list option2
+langgraph -> playwright : close session
+langgraph -> langgraph : interrupt execution
+langgraph -> streamlit : list option2
+streamlit -> user : option2
+
+user -> streamlit : option2
+streamlit -> langgraph : option2
+langgraph -> playwright : instantiate session + option1 + option2
+playwright -> langgraph : close session
+playwright -> langgraph : to elaborate data
+langgraph -> streamlit : AI(elaborated data)
+streamlit -> user : AI(elaborated data)
+
+@enduml
